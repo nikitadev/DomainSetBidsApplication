@@ -1,0 +1,17 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:models="clr-namespace:DomainSetBidsApplication.Models;assembly=DomainSetBidsApplication">
+    
+    <!--DataType="{x:Type models:LogEntity}"-->
+    <DataTemplate x:Key="LogTemplateKey">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock TextWrapping="Wrap" Text="{Binding Name}" />
+            <TextBlock Grid.Column="1" TextWrapping="Wrap" Text="{Binding Description}" />
+        </Grid>
+    </DataTemplate>
+    
+</ResourceDictionary>

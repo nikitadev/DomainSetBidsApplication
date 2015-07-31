@@ -1,0 +1,184 @@
+﻿<controls:MetroWindow x:Class="DomainSetBidsApplication.Views.MainWindowView"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+                      xmlns:ei="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions"
+                      xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Platform"
+                      xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+                      xmlns:views="clr-namespace:DomainSetBidsApplication.Views"
+                      xmlns:behaviors="clr-namespace:DomainSetBidsApplication.Behaviors"
+                      mc:Ignorable="d"
+                      Title="Domain set bids" 
+                      Height="550" Width="700"
+                      WindowStartupLocation="CenterScreen"
+                      WindowState="Maximized"
+                      NonActiveGlowBrush="Red"
+                      RightWindowCommandsOverlayBehavior="HiddenTitleBar"
+                      GlowBrush="{DynamicResource AccentColorBrush}"
+                      DataContext="{Binding Source={StaticResource Locator}, Path=Main}">
+    
+    <controls:MetroWindow.RightWindowCommands>
+        <controls:WindowCommands>
+            <ToggleButton Content=""
+                          FontSize="16"
+                          FontFamily="Segoe UI Symbol"
+                          ToolTip="Settings"
+                          IsChecked="{Binding IsSettingsOpen}" />
+        </controls:WindowCommands>
+    </controls:MetroWindow.RightWindowCommands>
+    
+    <controls:MetroWindow.Flyouts>
+        <controls:FlyoutsControl>
+            <controls:Flyout x:Name="flyout"
+                             IsModal="True"
+                             Position="Right"
+                             Header="Settings"
+                             IsOpen="{Binding IsSettingsOpen}">
+                <StackPanel Margin="10" DataContext="{Binding Source={StaticResource Locator}, Path=UserInfo}">
+                    <ComboBox Width="300"
+                              Margin="10"
+                              SelectedItem="{Binding Register}"
+                              ItemsSource="{Binding Registers}" />
+                    <StackPanel Margin="10" Width="300" Orientation="Horizontal">
+                        <TextBox Width="100" 
+                                 controls:TextBoxHelper.Watermark="Username"
+                                 Text="{Binding Username}" />
+                        <TextBox Width="100" 
+                                 Margin="10, 0, 0, 0" 
+                                 controls:TextBoxHelper.Watermark="Password"
+                                 Text="{Binding Password}" />
+                        <Button Margin="10, 0, 0, 0" Content="Check" Command="{Binding CheckCommand}" Style="{DynamicResource AccentedSquareButtonStyle}" />
+                    </StackPanel>
+                    <Label Margin="10" Width="300">
+                        <TextBlock Text="{Binding CheckResult}" TextWrapping="WrapWithOverflow" />
+                    </Label>
+                    <Separator />
+                    <StackPanel Margin="10" Width="300">
+                        <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="descr" Text="{Binding Description}" />
+                        <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="person" Text="{Binding Person}" />
+                        <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="person_r" Text="{Binding PersonLocalization}" />
+                        <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="passport" Text="{Binding Passport}" />
+                        <DatePicker Margin="0, 10, 0, 0"
+                                    SelectedDate="{Binding BirthDate, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=True}"
+                                    controls:TextBoxHelper.Watermark="birth_date" />
+                        <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="p_addr" Text="{Binding Address}" />
+                        <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="phone" Text="{Binding Phone}" />
+                        <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="e_mail" Text="{Binding Email}" />
+                        <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="country" Text="{Binding Country}" />
+                    </StackPanel>
+                    <Separator />
+                    <Button Width="80"
+                            Margin="10"
+                            Content="Save"
+                            HorizontalAlignment="Right"
+                            Command="{Binding SaveCommand}"
+                            Style="{DynamicResource AccentedSquareButtonStyle}" />
+                </StackPanel>
+            </controls:Flyout>
+            <controls:Flyout x:Name="appbar"
+                             Position="Bottom"
+                             Height="70"
+                             IsPinned="False"
+                             CloseButtonVisibility="Collapsed"
+                             TitleVisibility="Collapsed"
+                             IsOpen="{Binding IsCommandBarOpen}">
+                <StackPanel Margin="10" Orientation="Horizontal">
+                    <Button Width="50"
+                            Height="50"
+                            Margin="10, 0, 0, 0"
+                            Command="{Binding StartCommand}"
+                            IsEnabled="{Binding IsStartCommandEnabled}"
+                            Style="{DynamicResource MetroCircleButtonStyle}">
+                        <Rectangle Width="10"
+                                   Height="10"
+                                   Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
+                            <Rectangle.OpacityMask>
+                                <VisualBrush Stretch="Fill"
+                                     Visual="{DynamicResource appbar_control_play}" />
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
+                    </Button>
+                    <Button Width="50"
+                           Height="50"
+                           Margin="10, 0, 0, 0"
+                           Command="{Binding StopCommand}"
+                           IsEnabled="{Binding IsStopCommandEnabled}"
+                           Style="{DynamicResource MetroCircleButtonStyle}">
+                        <Rectangle Width="10"
+                                   Height="10"
+                                   Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
+                            <Rectangle.OpacityMask>
+                                <VisualBrush Stretch="Fill"
+                                     Visual="{DynamicResource appbar_control_stop}" />
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
+                    </Button>
+                    <Button Width="50"
+                           Height="50"
+                           Margin="10, 0, 0, 0"
+                           Command="{Binding EditCommand}"
+                           Style="{DynamicResource MetroCircleButtonStyle}">
+                        <Rectangle Width="10"
+                                   Height="10"
+                                   Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
+                            <Rectangle.OpacityMask>
+                                <VisualBrush Stretch="Fill"
+                                     Visual="{DynamicResource appbar_edit}" />
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
+                    </Button>
+                    <Button Width="50"
+                           Height="50"
+                           Margin="10, 0, 0, 0"
+                           Command="{Binding DeleteCommand}"
+                           Style="{DynamicResource MetroCircleButtonStyle}">
+                        <Rectangle Width="10"
+                                   Height="10"
+                                   Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
+                            <Rectangle.OpacityMask>
+                                <VisualBrush Stretch="Fill"
+                                     Visual="{DynamicResource appbar_delete}" />
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
+                    </Button>
+                </StackPanel>
+            </controls:Flyout>
+        </controls:FlyoutsControl>
+    </controls:MetroWindow.Flyouts>
+    
+    <controls:MetroContentControl Template="{StaticResource ElementControlTemplateKey}">
+        <Grid>
+            <Grid Visibility="{Binding IsFrameVisible, Converter={StaticResource BooleanToVisibilityInvertConverterKey}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid Margin="10">
+                    <views:MonitorView DataContext="{Binding}" />
+                    <Border Background="WhiteSmoke" Opacity="0.8" Visibility="{Binding IsDataLoaded, Converter={StaticResource BooleanToVisibilityConverterKey}, UpdateSourceTrigger=PropertyChanged}" />
+                    <controls:ProgressRing IsActive="True"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center"
+                                           Visibility="{Binding IsDataLoaded, Converter={StaticResource BooleanToVisibilityConverterKey}, UpdateSourceTrigger=PropertyChanged}" />
+                </Grid>
+                <views:LoggingView Grid.Row="1" Margin="10" DataContext="{Binding}" />
+            </Grid>
+            <Frame x:Name="mainFrame" 
+                   Grid.Row="1" Margin="10" Source="{Binding PageUri}" 
+                   behaviors:FrameBehavior.Title="{Binding PageTitle}"
+                   Template="{StaticResource FrameControlTemplateKey}"
+                   Visibility="{Binding IsFrameVisible, Converter={StaticResource BooleanToVisibilityConverterKey}}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Navigating">
+                        <cmd:EventToCommand Command="{Binding NavigatingCommand}" PassEventArgsToCommand="True" />
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="Navigated">
+                        <cmd:EventToCommand Command="{Binding NavigatedCommand}" PassEventArgsToCommand="True" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </Frame>
+        </Grid>
+    </controls:MetroContentControl>
+</controls:MetroWindow>
