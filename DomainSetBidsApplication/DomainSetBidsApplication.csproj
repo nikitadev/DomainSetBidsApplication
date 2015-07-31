@@ -25,9 +25,16 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <InstallUrl>https://raw.githubusercontent.com/nikitadev/DomainSetBidsApplication/master/DomainSetBidsApplication/publish/</InstallUrl>
+    <SupportUrl>https://github.com/nikitadev/DomainSetBidsApplication/</SupportUrl>
+    <ErrorReportUrl>https://github.com/nikitadev/DomainSetBidsApplication/labels/bug</ErrorReportUrl>
+    <ProductName>Set Domain Bids</ProductName>
+    <PublisherName>nikitadev</PublisherName>
+    <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
+    <TrustUrlParameters>true</TrustUrlParameters>
     <ApplicationRevision>1</ApplicationRevision>
     <ApplicationVersion>1.0.0.1</ApplicationVersion>
-    <UseApplicationTrust>false</UseApplicationTrust>
+    <UseApplicationTrust>true</UseApplicationTrust>
+    <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
