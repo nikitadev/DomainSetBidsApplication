@@ -29,6 +29,7 @@
     <ErrorReportUrl>https://github.com/nikitadev/DomainSetBidsApplication/labels/bug</ErrorReportUrl>
     <ProductName>Set Domain Bids</ProductName>
     <PublisherName>nikitadev</PublisherName>
+    <SuiteName>DomainSetBidsApplication</SuiteName>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
     <TrustUrlParameters>true</TrustUrlParameters>
     <ApplicationRevision>2</ApplicationRevision>
