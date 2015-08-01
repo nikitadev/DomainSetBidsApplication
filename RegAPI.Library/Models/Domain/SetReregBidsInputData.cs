@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace RegAPI.Library.Models.Domain
 {
@@ -11,9 +6,14 @@ namespace RegAPI.Library.Models.Domain
     {
         public Contacts Contacts { get; set; }
 
+        public Domain[] Domains { get; set; }
+
         [JsonProperty("nss")]
         public NSServer NSServer { get; set; }
 
-        public Domain[] Domains { get; set; }
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
     }
 }

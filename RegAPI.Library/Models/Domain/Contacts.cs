@@ -16,8 +16,7 @@ namespace RegAPI.Library.Models.Domain
         [JsonProperty("person_r")]
         public string PersonLocalName { get; set; }
 
-        [JsonProperty("passport")]
-        public string PassportContent { get; set; }
+        public string Passport { get; set; }
 
         [JsonProperty("birth_date")]
         public DateTime BirthDate { get; set; }

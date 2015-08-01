@@ -1,0 +1,69 @@
+﻿<UserControl x:Class="DomainSetBidsApplication.Views.MonitorCommandBarView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DomainSetBidsApplication.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <StackPanel Margin="10" Orientation="Horizontal">
+        <Button Width="50"
+                Height="50"
+                Margin="10, 0, 0, 0"
+                Command="{Binding StartCommand}"
+                IsEnabled="{Binding IsStartCommandEnabled}"
+                Style="{DynamicResource MetroCircleButtonStyle}">
+            <Rectangle Width="10"
+                       Height="10"
+                       Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
+                <Rectangle.OpacityMask>
+                    <VisualBrush Stretch="Fill"
+                                 Visual="{DynamicResource appbar_control_play}" />
+                </Rectangle.OpacityMask>
+            </Rectangle>
+        </Button>
+        <Button Width="50"
+                Height="50"
+                Margin="10, 0, 0, 0"
+                Command="{Binding StopCommand}"
+                IsEnabled="{Binding IsStopCommandEnabled}"
+                Style="{DynamicResource MetroCircleButtonStyle}">
+            <Rectangle Width="10"
+                       Height="10"
+                       Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
+                <Rectangle.OpacityMask>
+                    <VisualBrush Stretch="Fill"
+                                 Visual="{DynamicResource appbar_control_stop}" />
+                </Rectangle.OpacityMask>
+            </Rectangle>
+        </Button>
+        <Button Width="50"
+                Height="50"
+                Margin="10, 0, 0, 0"
+                Command="{Binding EditCommand}"
+                Style="{DynamicResource MetroCircleButtonStyle}">
+            <Rectangle Width="10"
+                       Height="10"
+                       Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
+                <Rectangle.OpacityMask>
+                    <VisualBrush Stretch="Fill"
+                                 Visual="{DynamicResource appbar_edit}" />
+                </Rectangle.OpacityMask>
+            </Rectangle>
+        </Button>
+        <Button Width="50"
+                Height="50"
+                Margin="10, 0, 0, 0"
+                Command="{Binding DeleteCommand}"
+                Style="{DynamicResource MetroCircleButtonStyle}">
+            <Rectangle Width="10"
+                       Height="10"
+                       Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
+                <Rectangle.OpacityMask>
+                    <VisualBrush Stretch="Fill"
+                                 Visual="{DynamicResource appbar_delete}" />
+                </Rectangle.OpacityMask>
+            </Rectangle>
+        </Button>
+    </StackPanel>
+</UserControl>

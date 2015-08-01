@@ -42,35 +42,12 @@ namespace DomainSetBidsApplication.ViewModels
             }
         }
 
-        public UserInfoViewModel UserInfo
-        {
-            get
-            {
-                return ServiceLocator.Current.GetInstance<UserInfoViewModel>();
-            }
-        }
-
-        public MonitorViewModel Monitor
-        {
-            get
-            {
-                return ServiceLocator.Current.GetInstance<MonitorViewModel>();
-            }
-        }
-
-        public LoggingViewModel Logging
-        {
-            get
-            {
-                return ServiceLocator.Current.GetInstance<LoggingViewModel>();
-            }
-        }
-
         public AddDomainPageViewModel AddDomainPage
         {
             get
             {
-                return ServiceLocator.Current.GetInstance<AddDomainPageViewModel>();
+                var service = ServiceLocator.Current.GetInstance<IRegDomainService>();
+                return new AddDomainPageViewModel(service);
             }
         }
 
@@ -81,36 +58,33 @@ namespace DomainSetBidsApplication.ViewModels
         {
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
 
-            ////if (ViewModelBase.IsInDesignModeStatic)
-            ////{
-            ////    // Create design time view services and models
-            ////    SimpleIoc.Default.Register<IDataService, DesignDataService>();
-            ////}
-            ////else
-            ////{
-            ////    // Create run time view services and models
-            ////    SimpleIoc.Default.Register<IDataService, DataService>();
-            ////}
+            if (ViewModelBase.IsInDesignModeStatic)
+            {
+                // Create design time view services and models
+                //SimpleIoc.Default.Register<IDataService, DesignDataService>();
+            }
+            else
+            {
+                // Create run time view services and models
+                SimpleIoc.Default.Register<IApiFactory, ApiFactory>();
 
-            SimpleIoc.Default.Register<IApiFactory, ApiFactory>();
+                var connection = new DbConnection("data");
 
-            var connection = new DbConnection("data");
+                SimpleIoc.Default.Register<IDbConnection>(() => connection);
+                SimpleIoc.Default.Register<IRepository<LogEntity>, MainRepository<LogEntity>>();
+                SimpleIoc.Default.Register<IRepository<UserInfoEntity>, MainRepository<UserInfoEntity>>();
+                SimpleIoc.Default.Register<IRepository<RegDomainEntity>, MainRepository<RegDomainEntity>>();
 
-            SimpleIoc.Default.Register<IDbConnection>(() => connection);
-            SimpleIoc.Default.Register<IRepository<LogEntity>, MainRepository<LogEntity>>();
-            SimpleIoc.Default.Register<IRepository<UserInfoEntity>, MainRepository<UserInfoEntity>>();
-            SimpleIoc.Default.Register<IRepository<RegDomainEntity>, MainRepository<RegDomainEntity>>();
+                SimpleIoc.Default.Register<ILogService, LogService>();
+                SimpleIoc.Default.Register<IUserInfoService, UserInfoService>();
+                SimpleIoc.Default.Register<IRegDomainService, RegDomainService>();
 
-            SimpleIoc.Default.Register<ILogService, LogService>();
-            SimpleIoc.Default.Register<IUserInfoService, UserInfoService>();
-            SimpleIoc.Default.Register<IRegDomainService, RegDomainService>();
+                SimpleIoc.Default.Register<Bootstrapper>();
 
-            SimpleIoc.Default.Register<Bootstrapper>();
-
-            SimpleIoc.Default.Register<MainViewModel>();
-            //SimpleIoc.Default.Register<MonitorViewModel>();
-            SimpleIoc.Default.Register<UserInfoViewModel>();
-            SimpleIoc.Default.Register<AddDomainPageViewModel>();
+                SimpleIoc.Default.Register<MainViewModel>();
+                SimpleIoc.Default.Register<UserInfoViewModel>();
+                SimpleIoc.Default.Register<AddDomainPageViewModel>();
+            }            
         }
 
         public static Uri GetPathPage(Type typeViewModel)

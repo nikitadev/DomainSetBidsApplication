@@ -1,0 +1,68 @@
+﻿<UserControl x:Class="DomainSetBidsApplication.Views.UserInfoSettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DomainSetBidsApplication.Views"
+             xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="350" Margin="10">
+    <StackPanel>
+        <ComboBox Width="300"
+                  Margin="10"
+                  SelectedItem="{Binding Register}"
+                  ItemsSource="{Binding Registers}" />
+        <Grid Margin="10" Width="300">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBox controls:TextBoxHelper.Watermark="Username"
+                     Text="{Binding Username}" />
+            <TextBox Grid.Column="1"
+                     Margin="10, 0, 0, 0" 
+                     controls:TextBoxHelper.Watermark="Password"
+                     Text="{Binding Password}" />
+        </Grid>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Margin="10, 0" Width="80" Content="Test login" Command="{Binding PopulateTestLoginCommand}" Style="{DynamicResource AccentedSquareButtonStyle}" />
+            <Button Margin="10, 0" Width="80" Content="Check" Command="{Binding CheckCommand}" Style="{DynamicResource AccentedSquareButtonStyle}" />
+        </StackPanel>
+        
+        <Label Margin="10" Width="300">
+            <TextBlock Text="{Binding CheckResult}" TextWrapping="WrapWithOverflow" />
+        </Label>
+        <Separator />
+        <StackPanel Margin="10" Width="300">
+            <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="descr" Text="{Binding Description}" />
+            <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="person" Text="{Binding Person}" />
+            <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="person_r" Text="{Binding PersonLocalName}" />
+            <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="passport" Text="{Binding Passport}" />
+            <DatePicker Margin="0, 10, 0, 0"
+                        SelectedDate="{Binding BirthDate, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=True}"
+                        controls:TextBoxHelper.Watermark="birth_date" />
+            <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="p_addr" Text="{Binding PersonAddress}" />
+            <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="phone" Text="{Binding Phone}" />
+            <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="e_mail" Text="{Binding Email}" />
+            <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="country" Text="{Binding Country}" />
+        </StackPanel>
+        <Separator />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Width="80"
+                    Margin="10"
+                    Content="Test data" 
+                    Command="{Binding PopulateTestDataCommand}"
+                    Style="{DynamicResource AccentedSquareButtonStyle}" />
+            <Button Width="80"
+                    Margin="10"
+                    Content="Clear" 
+                    Command="{Binding ClearCommand}"
+                    Style="{DynamicResource AccentedSquareButtonStyle}" />
+            <Button Width="80"
+                    Margin="10"
+                    Content="Save"
+                    Command="{Binding SaveCommand}"
+                    Style="{DynamicResource AccentedSquareButtonStyle}" />
+        </StackPanel>
+    </StackPanel>
+</UserControl>

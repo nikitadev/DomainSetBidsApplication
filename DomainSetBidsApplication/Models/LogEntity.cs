@@ -1,4 +1,5 @@
-﻿using DomainSetBidsApplication.Fundamentals.Interfaces;
+﻿using System;
+using DomainSetBidsApplication.Fundamentals.Interfaces;
 using SQLite;
 
 namespace DomainSetBidsApplication.Models
@@ -13,6 +14,8 @@ namespace DomainSetBidsApplication.Models
         public string Name { get; set; }
 
         public string Description { get; set; }
+
+        public DateTime Date { get; set; }
 
         public LogType Type { get; set; }
     }

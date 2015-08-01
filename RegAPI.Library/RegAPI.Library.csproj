@@ -57,6 +57,7 @@
     <Compile Include="Infostructures\Interfaces\IDomainProvider.cs" />
     <Compile Include="Infostructures\Interfaces\IQuerySettings.cs" />
     <Compile Include="Infostructures\Interfaces\IRequestManager.cs" />
+    <Compile Include="LowercaseContractResolver.cs" />
     <Compile Include="Models\Autorization\AutorizationAnswer.cs" />
     <Compile Include="Models\Domain\Contacts.cs" />
     <Compile Include="Models\Domain\Domain.cs" />

@@ -1,20 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using DomainSetBidsApplication.Models;
-using DomainSetBidsApplication.ViewModels;
+using RegAPI.Library.Models;
+using RegAPI.Library.Models.Autorization;
 
 namespace DomainSetBidsApplication.Fundamentals.Interfaces
 {
-    public interface IUserInfoService
+    public interface IUserInfoService : IService<UserInfoEntity>
     {
-        Task CreateTableAsync();
-
-        Task InsertAsync(UserInfoEntity entity);
-
-        Task<List<UserInfoEntity>> GetAllAsync();
-
-        Task<UserInfoEntity> GetAsync(int id);
-
         Task<UserInfoEntity> GetByNameAsync(string name);
+
+        Task<Result<AutorizationAnswer>> CheckAutorization(string username, string password);
     }
 }

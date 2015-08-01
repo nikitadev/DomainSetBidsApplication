@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using RegAPI.Library.Infostructures.Interfaces;
 using RegAPI.Library.Models;
 using RegAPI.Library.Models.Domain;

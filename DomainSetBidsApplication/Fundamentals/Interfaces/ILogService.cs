@@ -1,20 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DomainSetBidsApplication.Models;
+﻿using DomainSetBidsApplication.Models;
 
 namespace DomainSetBidsApplication.Fundamentals.Interfaces
 {
-    public interface ILogService
+    public interface ILogService : IService<LogEntity>
     {
-        Task CreateTableAsync();
-
-        Task InsertAsync(LogEntity entity);
-
-        Task<List<LogEntity>> GetAllAsync();
-
-        Task<LogEntity> GetAsync(int id);
     }
 }

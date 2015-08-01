@@ -1,5 +1,6 @@
 ﻿using System;
 using DomainSetBidsApplication.Fundamentals.Interfaces;
+using Newtonsoft.Json;
 using SQLite;
 
 namespace DomainSetBidsApplication.Models
@@ -14,10 +15,16 @@ namespace DomainSetBidsApplication.Models
 
         public string Register { get; set; }
 
-        public decimal Rate { get; set; }
+        public int Rate { get; set; }
 
         public int Frequency { get; set; }
 
         public DateTime Date { get; set; }
+
+        public int Hour { get; set; }
+
+        public int Minute { get; set; }
+
+        public int Second { get; set; }
     }
 }

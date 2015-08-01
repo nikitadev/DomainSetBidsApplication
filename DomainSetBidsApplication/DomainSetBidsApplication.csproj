@@ -32,8 +32,8 @@
     <SuiteName>DomainSetBidsApplication</SuiteName>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
     <TrustUrlParameters>true</TrustUrlParameters>
-    <ApplicationRevision>2</ApplicationRevision>
-    <ApplicationVersion>1.0.0.2</ApplicationVersion>
+    <ApplicationRevision>3</ApplicationRevision>
+    <ApplicationVersion>1.0.0.3</ApplicationVersion>
     <UseApplicationTrust>true</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -124,6 +124,7 @@
     <Compile Include="Converters\BooleanInvertConverter.cs" />
     <Compile Include="Converters\BooleanToVisibilityInvertConverter.cs" />
     <Compile Include="Converters\StringToResourceConverter.cs" />
+    <Compile Include="DefaultUserSettings.cs" />
     <Compile Include="Fundamentals\Abstracts\BaseService.cs" />
     <Compile Include="Fundamentals\Bootstrapper.cs" />
     <Compile Include="Fundamentals\CacheTags.cs" />
@@ -134,12 +135,15 @@
     <Compile Include="Fundamentals\Interfaces\IDbConnection.cs" />
     <Compile Include="Fundamentals\Interfaces\IDbEntity.cs" />
     <Compile Include="Fundamentals\Interfaces\IRepository.cs" />
+    <Compile Include="Fundamentals\Interfaces\IService.cs" />
     <Compile Include="Fundamentals\Interfaces\IUserInfoService.cs" />
     <Compile Include="Fundamentals\Interfaces\IValidateViewModel.cs" />
     <Compile Include="Fundamentals\Repositories\MainRepository.generic.cs" />
     <Compile Include="Fundamentals\Services\LogService.cs" />
     <Compile Include="Fundamentals\Services\RegDomainService.cs" />
-    <Compile Include="Fundamentals\UserInfoService.cs" />
+    <Compile Include="Fundamentals\Services\UserInfoService.cs" />
+    <Compile Include="Models\DbEntity.extension.cs" />
+    <Compile Include="Models\DetailsPageMessage.cs" />
     <Compile Include="Models\LogEntity.cs" />
     <Compile Include="Models\LogType.cs" />
     <Compile Include="Models\PageMessage.cs" />
@@ -149,8 +153,11 @@
     <Compile Include="Models\UserInfoEntity.cs" />
     <Compile Include="SQLite.cs" />
     <Compile Include="SQLiteAsync.cs" />
+    <Compile Include="ViewModels\InteractionListeners\IRegDomainInteractionListener.cs" />
+    <Compile Include="ViewModels\InteractionListeners\IMonitorCommandBarInteractionListener.cs" />
     <Compile Include="ViewModels\LoggingViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="ViewModels\MonitorCommandBarViewModel.cs" />
     <Compile Include="ViewModels\MonitorViewModel.cs" />
     <Compile Include="ViewModels\Pages\AddDomainPageViewModel.cs" />
     <Compile Include="ViewModels\RegDomainViewModel.cs" />
@@ -159,11 +166,17 @@
     <Compile Include="Views\LoggingView.xaml.cs">
       <DependentUpon>LoggingView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\MonitorCommandBarView.xaml.cs">
+      <DependentUpon>MonitorCommandBarView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MonitorView.xaml.cs">
       <DependentUpon>MonitorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Pages\AddDomainPageView.xaml.cs">
       <DependentUpon>AddDomainPageView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UserInfoSettingsView.xaml.cs">
+      <DependentUpon>UserInfoSettingsView.xaml</DependentUpon>
     </Compile>
     <Page Include="Resources\ControlTemplates.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -181,6 +194,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Resources\Styles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\LoggingView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -197,11 +214,19 @@
       <DependentUpon>MainWindowView.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\MonitorCommandBarView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MonitorView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Pages\AddDomainPageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\UserInfoSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

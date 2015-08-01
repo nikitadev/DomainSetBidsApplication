@@ -17,6 +17,7 @@
                 <ResourceDictionary Source="pack://application:,,,/DomainSetBidsApplication;component/Resources/Icons.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/DomainSetBidsApplication;component/Resources/Converters.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/DomainSetBidsApplication;component/Resources/DataTemplates.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/DomainSetBidsApplication;component/Resources/Styles.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/DomainSetBidsApplication;component/Resources/ControlTemplates.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

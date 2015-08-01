@@ -10,10 +10,7 @@ namespace AviaTicketsWpfApplication.Fundamentals
 
 		public SQLiteAsyncConnection Connection
 		{  
-			get
-			{
-				return _dbConnection.SQLiteConnection;
-            }
+			get { return _dbConnection.SQLiteConnection; }
 		}
 
 		public MainRepository(IDbConnection dbConnection)
@@ -23,17 +20,26 @@ namespace AviaTicketsWpfApplication.Fundamentals
 
 		public async Task InsertAsync(T entity)
 		{
-			await Connection.InsertAsync(entity);
+            if (await Connection.ExistsAsync<T>())
+            {
+                await Connection.InsertAsync(entity);
+            }
 		}
 
 		public async Task UpdateAsync(T entity)
 		{
-			await Connection.UpdateAsync(entity);
+            if (await Connection.ExistsAsync<T>())
+            {
+                await Connection.UpdateAsync(entity);
+            }
 		}
 
 		public async Task DeleteAsync(T entity)
 		{
-			await Connection.DeleteAsync(entity);
+            if (await Connection.ExistsAsync<T>())
+            {
+                await Connection.DeleteAsync(entity);
+            }
 		}
 
         public AsyncTableQuery<T> Table

@@ -8,9 +8,15 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBlock TextWrapping="Wrap" Text="{Binding Name}" />
-            <TextBlock Grid.Column="1" TextWrapping="Wrap" Text="{Binding Description}" />
+            <TextBlock Margin="0,0,10,0" Text="{Binding Date, StringFormat={}{0:dd.MM.yyyy hh:mm:ss}}" />
+            <TextBlock Grid.Column="1" Margin="0,0,10,0">
+                <Run Text="| " />
+                <Run Text="{Binding Name}"/>
+                <Run Text=" |" />
+            </TextBlock>
+            <TextBlock Grid.Column="2" TextWrapping="Wrap" Text="{Binding Description}" />
         </Grid>
     </DataTemplate>
     

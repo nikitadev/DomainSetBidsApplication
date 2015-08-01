@@ -1,4 +1,5 @@
 ﻿using System;
+using Newtonsoft.Json;
 using RegAPI.Library.Infostructures.Implements;
 using RegAPI.Library.Infostructures.Interfaces;
 using RegAPI.Library.Models.Implements;
@@ -43,6 +44,13 @@ namespace RegAPI.Library
 
         public ApiFactory()
         {
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+            {
+                NullValueHandling = NullValueHandling.Ignore,
+                DateFormatString = "dd.MM.yyyy",
+                ContractResolver = new LowercaseContractResolver()
+            };
+
             _requestManager = new RequestManager();
 
             _creatorDomainProvider = new Func<IDomainProvider>(() => new DomainProvider(_requestManager));

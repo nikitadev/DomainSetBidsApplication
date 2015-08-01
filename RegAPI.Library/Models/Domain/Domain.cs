@@ -15,7 +15,7 @@ namespace RegAPI.Library.Models.Domain
         [JsonProperty("dname")]
         public string Name { get; set; }
 
-        public decimal Price { get; set; }
+        public int Price { get; set; }
 
         [JsonProperty("service_id")]
         public int? ServiceId { get; set; }

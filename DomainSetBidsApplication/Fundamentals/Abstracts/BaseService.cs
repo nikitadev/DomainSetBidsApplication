@@ -5,7 +5,7 @@ using RegAPI.Library;
 
 namespace DomainSetBidsApplication.Fundamentals.Abstracts
 {
-    public abstract class BaseService<T> where T : IDbEntity, new()
+    public abstract class BaseService<T> : IService<T> where T : IDbEntity, new()
     {
         protected readonly IApiFactory _apiFactory;
         protected readonly IRepository<T> _repository;

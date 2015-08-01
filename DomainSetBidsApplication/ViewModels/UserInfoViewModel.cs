@@ -15,12 +15,15 @@ namespace DomainSetBidsApplication.ViewModels
     public sealed class UserInfoViewModel : ViewModelBase
     {
         private readonly IUserInfoService _userInfoService;
-        private readonly IRegDomainService _regDomainService;
 
-        public List<string> Registers { get; set; }
+        public List<string> Registers { get; private set; }
 
-        public RelayCommand CheckCommand { get; set; }
-        public RelayCommand SaveCommand { get; set; }
+        public RelayCommand CheckCommand { get; private set; }
+        public RelayCommand SaveCommand { get; private set; }
+        public RelayCommand ClearCommand { get; private set; }
+
+        public RelayCommand PopulateTestDataCommand { get; private set; }
+        public RelayCommand PopulateTestLoginCommand { get; private set; }
 
         public RelayCommand<string> PopulateCommand { get; set; }
 
@@ -61,13 +64,13 @@ namespace DomainSetBidsApplication.ViewModels
             set { Set(ref _person, value); }
         }
 
-        private string _personLocalization;
+        private string _personLocalName;
 
         [JsonProperty("person_r")]
-        public string PersonLocalization
+        public string PersonLocalName
         {
-            get { return _personLocalization; }
-            set { Set(ref _personLocalization, value); }
+            get { return _personLocalName; }
+            set { Set(ref _personLocalName, value); }
         }
 
         private string _passport;
@@ -86,13 +89,13 @@ namespace DomainSetBidsApplication.ViewModels
             set { Set(ref _birthDate, value); }
         }
 
-        private string _address;
+        private string _personAddress;
 
         [JsonProperty("p_addr")]
-        public string Address
+        public string PersonAddress
         {
-            get { return _address; }
-            set { Set(ref _address, value); }
+            get { return _personAddress; }
+            set { Set(ref _personAddress, value); }
         }
 
         private string _phone;
@@ -130,11 +133,8 @@ namespace DomainSetBidsApplication.ViewModels
             }
         }
 
-        public UserInfoViewModel(
-            IRegDomainService regDomainService, 
-            IUserInfoService userInfoService)
+        public UserInfoViewModel(IUserInfoService userInfoService)
         {
-            _regDomainService = regDomainService;
             _userInfoService = userInfoService;
 
             BirthDate = DateTime.Today;
@@ -148,7 +148,40 @@ namespace DomainSetBidsApplication.ViewModels
             Register = Registers.First();
             
             CheckCommand = new RelayCommand(async () => await CheckCommandHandler());
-            SaveCommand = new RelayCommand(async () => await SaveCommandHandler());            
+            ClearCommand = new RelayCommand(ClearCommandHandler);
+
+            PopulateTestLoginCommand = new RelayCommand(PopulateTestLoginCommandHandler);
+            PopulateTestDataCommand = new RelayCommand(PopulateTestDataCommandHandler);
+
+            SaveCommand = new RelayCommand(async () => await SaveCommandHandler());       
+        }
+
+        private void ClearCommandHandler()
+        {
+            Phone = Email = PersonAddress = PersonLocalName = Description = Person = Passport = String.Empty;
+
+            BirthDate = DateTime.Today;
+            Country = "RU";
+        }
+
+        private void PopulateTestLoginCommandHandler()
+        {
+            Username = DefaultUserSettings.UserName;
+            Password = DefaultUserSettings.Password;
+        }
+
+        private void PopulateTestDataCommandHandler()
+        {
+            var contacts = DefaultUserSettings.GetContacts();
+
+            Description = contacts.Description;
+            Person = contacts.Person;
+            PersonLocalName = contacts.PersonLocalName;
+            BirthDate = contacts.BirthDate;
+            Passport = contacts.Passport;
+            PersonAddress = contacts.PersonAddress;
+            Phone = contacts.Phone;
+            Email = contacts.Email;
         }
 
         public async Task PopulateAsync(string register)
@@ -163,10 +196,9 @@ namespace DomainSetBidsApplication.ViewModels
             }
             else
             {
-                Username = Password = Phone = Email = Address = PersonLocalization = Description = Person = Passport = String.Empty;
+                Username = Password = String.Empty;
 
-                BirthDate = DateTime.Today;
-                Country = "RU";
+                ClearCommandHandler();
             }
         }
 
@@ -176,16 +208,16 @@ namespace DomainSetBidsApplication.ViewModels
             {
                 Description = Description,
                 Person = Person,
-                PersonLocalName = PersonLocalization,
-                PassportContent = Passport,
+                PersonLocalName = PersonLocalName,
+                Passport = Passport,
                 Email = Email,
                 Phone = Phone,
                 BirthDate = BirthDate,
                 Country = Country,
-                PersonAddress = Address
+                PersonAddress = PersonAddress
             };
 
-            var entity = new UserInfoEntity
+            var userInfoEntity = new UserInfoEntity
             {
                 Name = Register,
                 Username = Username,
@@ -193,14 +225,23 @@ namespace DomainSetBidsApplication.ViewModels
                 Data = inputData.ToString()
             };
 
-            await _userInfoService.InsertAsync(entity);
+            var entity = await _userInfoService.GetByNameAsync(Register);
+            if (entity != null)
+            {
+                userInfoEntity.Id = entity.Id;
+                await _userInfoService.UpdateAsync(userInfoEntity);
+            }
+            else
+            {
+                await _userInfoService.InsertAsync(userInfoEntity);
+            }
         }
 
         private async Task CheckCommandHandler()
         {
             if (!String.IsNullOrEmpty(Username) && !String.IsNullOrEmpty(Password))
             {
-                var result = await _regDomainService.CheckAutorization(Username, Password);
+                var result = await _userInfoService.CheckAutorization(Username, Password);
 
                 if (result.ResultType == ResultType.ERROR)
                 {

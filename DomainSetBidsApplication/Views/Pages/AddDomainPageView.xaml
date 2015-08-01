@@ -5,15 +5,15 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:DomainSetBidsApplication.Views.Pages"
       xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
-      xmlns:sysglb="clr-namespace:System.Globalization;assembly=mscorlib"
       mc:Ignorable="d" 
       d:DesignHeight="300" d:DesignWidth="300"
       Title="Add Domain"
+      Template="{StaticResource PageControlTemplateKey}"
       DataContext="{Binding Source={StaticResource Locator}, Path=AddDomainPage}">
     <StackPanel Width="300">
         <TextBox Width="200"
                  Margin="0, 10, 0, 0"
-                 Text="{Binding DomainName}"
+                 Text="{Binding Name}"
                  controls:TextBoxHelper.Watermark="Domain name"
                  controls:TextBoxHelper.IsWaitingForData="True"
                  ToolTip="Enter domain name" />
@@ -24,7 +24,7 @@
         <TextBox Width="200"
                  Margin="0, 10, 0, 0"
                  controls:TextBoxHelper.Watermark="Rate"
-                 Text="{Binding Rate, StringFormat={}{0:C}, ConverterCulture={x:Static sysglb:CultureInfo.CurrentCulture}}"
+                 Text="{Binding Rate}"
                  ToolTip="Enter rate" />
         <DatePicker Width="200"
                     Margin="0, 10, 0, 0"
@@ -68,8 +68,8 @@
         <StackPanel Width="220" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Width="80"
                     Margin="10"
-                    Content="Add"
-                    Command="{Binding AddCommand}"
+                    Content="{Binding TitleAddOrEditButton}"
+                    Command="{Binding AddOrEditCommand}"
                     Style="{DynamicResource AccentedSquareButtonStyle}" />
             <Button Width="80"
                     Margin="10"

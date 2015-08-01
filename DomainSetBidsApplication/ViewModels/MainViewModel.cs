@@ -1,20 +1,19 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Navigation;
-using System.Windows.Threading;
 using AviaTicketsWpfApplication.Models;
 using DomainSetBidsApplication.Fundamentals;
 using DomainSetBidsApplication.Fundamentals.Interfaces;
-using DomainSetBidsApplication.Fundamentals.Services;
 using DomainSetBidsApplication.Models;
+using DomainSetBidsApplication.ViewModels.InteractionListeners;
 using DomainSetBidsApplication.ViewModels.Pages;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Threading;
-using RegAPI.Library.Models;
 
 namespace DomainSetBidsApplication.ViewModels
 {
@@ -30,8 +29,9 @@ namespace DomainSetBidsApplication.ViewModels
     /// See http://www.galasoft.ch/mvvm
     /// </para>
     /// </summary>
-    public sealed class MainViewModel : ViewModelBase
+    public sealed class MainViewModel : ViewModelBase, IRegDomainInteractionListener
     {
+        // TODO: убрать создание таблиц
         private readonly Bootstrapper _bootstraper;
 
         private readonly ILogService _logService;
@@ -43,17 +43,11 @@ namespace DomainSetBidsApplication.ViewModels
 
         public RelayCommand AddCommand { get; private set; }
         public RelayCommand ShowActionCommand { get; private set; }
-        public RelayCommand EditCommand { get; private set; }
-        public RelayCommand DeleteCommand { get; private set; }
 
-        public RelayCommand StartCommand { get; private set; }
-        public RelayCommand StopCommand { get; private set; }
-
-        public RelayCommand ClearCommand { get; set; }
+        public RelayCommand ClearCommand { get; private set; }
 
         public RelayCommand<NavigatingCancelEventArgs> NavigatingCommand { get; private set; }
         public RelayCommand<NavigationEventArgs> NavigatedCommand { get; private set; }
-        
 
         private ObservableCollection<RegDomainViewModel> _domains;
         public ObservableCollection<RegDomainViewModel> Domains
@@ -117,17 +111,11 @@ namespace DomainSetBidsApplication.ViewModels
             set { Set(ref _isCommandBarOpen, value); }
         }
 
-        private bool _isStartCommandEnabled, _isStopCommandEnabled;
-        public bool IsStartCommandEnabled
+        private UserInfoViewModel _userInfoViewModel;
+        public UserInfoViewModel UserInfo
         {
-            get { return _isStartCommandEnabled; }
-            set { Set(ref _isStartCommandEnabled, value); }
-        }
-
-        public bool IsStopCommandEnabled
-        {
-            get { return _isStopCommandEnabled; }
-            set { Set(ref _isStopCommandEnabled, value); }
+            get { return _userInfoViewModel; }
+            set { Set(ref _userInfoViewModel, value); }
         }
 
         private RegDomainViewModel _selectedItem;
@@ -143,8 +131,6 @@ namespace DomainSetBidsApplication.ViewModels
 
                 Set(ref _selectedItem, value);
 
-                EditCommand.RaiseCanExecuteChanged();
-                DeleteCommand.RaiseCanExecuteChanged();
                 ShowActionCommand.RaiseCanExecuteChanged();
             }
         }
@@ -173,22 +159,14 @@ namespace DomainSetBidsApplication.ViewModels
             {
                 // Code runs "for real"
 
-                IsStartCommandEnabled = true;
-                IsDataLoaded = IsFrameVisible = IsStopCommandEnabled = false;
+                IsDataLoaded = IsFrameVisible = false;
 
                 ContentLoadedCommand = new RelayCommand(async () => await InitializeAsync());
                 ContentUnloadedCommand = new RelayCommand(async () => await ClearAsync());
 
                 AddCommand = new RelayCommand(AddCommandHandler);
-                EditCommand = new RelayCommand(EditCommandHandler, () => SelectedItem != null);
-                DeleteCommand = new RelayCommand(async () => await DeleteCommandHandler(), () => SelectedItem != null);
-
-                ShowActionCommand = new RelayCommand(ShowActionCommandHandler, () => SelectedItem != null);
-
-                StartCommand = new RelayCommand(async () => await StartCommandHandler());
-                StopCommand = new RelayCommand(StopCommandHandler);
-
                 ClearCommand = new RelayCommand(() => Logs.Clear());
+                ShowActionCommand = new RelayCommand(ShowActionCommandHandler, () => SelectedItem != null);
 
                 NavigatingCommand = new RelayCommand<NavigatingCancelEventArgs>(NavigatingCommandHandler);
                 NavigatedCommand = new RelayCommand<NavigationEventArgs>(NavigatedCommandHandler);
@@ -196,7 +174,7 @@ namespace DomainSetBidsApplication.ViewModels
                 Logs = new ObservableCollection<LogEntity>();
                 Domains = new ObservableCollection<RegDomainViewModel>();
 
-                MessengerInstance.Register<RegDomainEntity>(this, RegDomainEntityMessageHandler);
+                MessengerInstance.Register<RegDomainEntity>(this, async e => await RegDomainEntityMessageHandler(e));
                 MessengerInstance.Register<LogEntity>(this, async e => await LogEntityMessageHandler(e));
             }
         }
@@ -205,7 +183,9 @@ namespace DomainSetBidsApplication.ViewModels
         {
             IsDataLoaded = true;
 
-            await _bootstraper.InitializeAsync();
+            await _bootstraper.InitializeAsync().ConfigureAwait(false);
+
+            UserInfo = new UserInfoViewModel(_userInfoService);
 
             var items = await _userInfoService.GetAllAsync();
             if (!items.Any())
@@ -217,19 +197,10 @@ namespace DomainSetBidsApplication.ViewModels
             foreach (var entity in entities)
             {
                 await Task.Yield();
-
-                Domains.Add(CreateRegDomainViewModel(entity));
+                await DispatcherHelper.RunAsync(() => Domains.Add(CreateRegDomainViewModel(entity)));
             }
 
             IsDataLoaded = false;
-        }
-        
-        private async Task DeleteCommandHandler()
-        {
-            IsCommandBarOpen = false;
-
-            await _regDomainService.DeleteAsync(SelectedItem.Entity.Id);
-            Domains.Remove(SelectedItem);
         }
 
         private void ShowActionCommandHandler()
@@ -237,59 +208,18 @@ namespace DomainSetBidsApplication.ViewModels
             IsCommandBarOpen = true;
         }
 
-        private async Task StartCommandHandler()
-        {
-            IsStartCommandEnabled = false;
-            IsStopCommandEnabled = true;
-
-            var userInfoEntity = await _userInfoService.GetByNameAsync(SelectedItem.Entity.Register);
-            if (userInfoEntity != null)
-            {
-                var tuple = _regDomainService.CreateTask(SelectedItem.Entity, userInfoEntity);
-
-                await tuple.Item1.ContinueWith(t =>
-                {
-                    if (t.IsCanceled)
-                    {
-                        SelectedItem.State = RegDomainMode.Cancel;
-                    }
-                    else if (t.IsCompleted)
-                    {
-                        //var logEntity = new LogEntity { Name = SelectedItem.Entity.Name };
-                        //logEntity.Type = LogType.Success;
-
-                        //await DispatcherHelper.RunAsync(() => Logs.Add(logEntity));
-
-                        SelectedItem.State = RegDomainMode.Done;
-                    }
-
-                    IsStartCommandEnabled = true;
-                    IsStopCommandEnabled = false;
-                }).ConfigureAwait(false);
-
-                SelectedItem.State = RegDomainMode.Work;
-                SelectedItem.TokenSource = tuple.Item2;
-            }
-        }
-
-        private void StopCommandHandler()
-        {
-            SelectedItem.TokenSource.Cancel();
-            
-        }
-
         private RegDomainViewModel CreateRegDomainViewModel(RegDomainEntity entity)
         {
-            var vm = new RegDomainViewModel
+            var regDomainViewModel = new RegDomainViewModel(this)
             {
                 Entity = entity,
                 State = RegDomainMode.Draft
             };
 
-            return vm;
+            return regDomainViewModel;
         }
 
-        private void RegDomainEntityMessageHandler(RegDomainEntity entity)
+        private async Task RegDomainEntityMessageHandler(RegDomainEntity entity)
         {
             if (entity != null)
             {
@@ -316,7 +246,6 @@ namespace DomainSetBidsApplication.ViewModels
             if (args.ExtraData != null)
             {
                 string parametrs = args.ExtraData.ToString();
-
                 var dicParams = parametrs.Split('&').Select(s =>
                 {
                     var keyvalue = s.Split('=');
@@ -324,19 +253,10 @@ namespace DomainSetBidsApplication.ViewModels
                     return new Tuple<string, string>(keyvalue[0], keyvalue[1]);
                 }).ToDictionary(x => x.Item1, x => x.Item2);
 
-                string title;
-                if (dicParams.TryGetValue("title", out title))
-                {
-                    //_titlePrev = PageTitle;
-
-                    PageTitle = title;
-
-                    dicParams.Remove("title");
-                }
-
                 if (dicParams.Count > 0)
                 {
-                    //MessengerInstance.Send(new DetailsPageMessage { Parametrs = dicParams });
+                    PageTitle = "Edit Domain";
+                    MessengerInstance.Send(new DetailsPageMessage { Parametrs = dicParams });
                 }
             }
         }
@@ -354,32 +274,40 @@ namespace DomainSetBidsApplication.ViewModels
                     IsFrameVisible = false;
                 }
             }
-        }
 
-        private void MouseDownCommandHandler(MouseButtonEventArgs args)
-        {
-            if (SelectedItem != null)
-            {
-                IsCommandBarOpen = !IsCommandBarOpen;
-            }
+            IsCommandBarOpen = false;
         }
 
         private void AddCommandHandler()
         {
             PageTitle = "Add Domain";
             MessengerInstance.Send(new PageMessage(typeof(AddDomainPageViewModel)));
-        }
-
-        private void EditCommandHandler()
-        {
-
-        }
+        }        
 
         private async Task ClearAsync()
         {
             await Task.Yield();
 
             Cleanup();
+        }
+
+        public async Task OnDomainRemoveAsync(RegDomainEntity entity)
+        {
+            await _regDomainService.DeleteAsync(entity.Id);
+            IsCommandBarOpen = false;
+
+            Domains.Remove(SelectedItem);
+        }
+
+        public async Task<Tuple<Task, CancellationTokenSource>> GetTaskAsync(RegDomainEntity entity)
+        {
+            var userInfoEntity = await _userInfoService.GetByNameAsync(entity.Register);
+            if (userInfoEntity != null)
+            {
+                return _regDomainService.CreateTask(entity, userInfoEntity);
+            }
+
+            return null;
         }
     }
 }

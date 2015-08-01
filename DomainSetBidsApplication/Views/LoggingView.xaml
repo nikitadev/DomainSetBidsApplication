@@ -35,6 +35,6 @@
                  BorderBrush="{StaticResource AccentColorBrush}"
                  BorderThickness="1"
                  ItemsSource="{Binding Logs}"
-                 ItemTemplate="{DynamicResource LogTemplateKey}" />
+                 ItemTemplate="{StaticResource LogTemplateKey}" />
     </Grid>
 </UserControl>

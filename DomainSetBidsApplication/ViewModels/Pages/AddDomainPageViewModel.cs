@@ -6,29 +6,39 @@ using DomainSetBidsApplication.Fundamentals.Interfaces;
 using DomainSetBidsApplication.Models;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using Newtonsoft.Json;
 
 namespace DomainSetBidsApplication.ViewModels.Pages
 {
     public sealed class AddDomainPageViewModel : ViewModelBase
     {
+        public const string ARG = "data";
+
         private readonly IRegDomainService _regDomainService;
 
-        private RegDomainEntity _regDomainEntity;
+        public RelayCommand AddOrEditCommand { get; private set; }
+        public RelayCommand RunCommand { get; private set; }
 
         public List<string> Registers { get; set; }
 
-        public RelayCommand AddCommand { get; private set; }
-        public RelayCommand RunCommand { get; private set; }
-
-        private string _domainName;
-        public string DomainName
+        private string _register;
+        public string Register
         {
-            get { return _domainName; }
-            set { Set(ref _domainName, value); }
+            get { return _register; }
+            set { Set(ref _register, value); }
         }
 
-        private decimal _rate;
-        public decimal Rate
+        public int Id { get; set; }
+
+        private string _name;
+        public string Name
+        {
+            get { return _name; }
+            set { Set(ref _name, value); }
+        }
+
+        private int _rate;
+        public int Rate
         {
             get { return _rate; }
             set { Set(ref _rate, value); }
@@ -43,53 +53,25 @@ namespace DomainSetBidsApplication.ViewModels.Pages
 
         private int _startTimeHours, _startTimeMinutes, _startTimeSeconds;
 
+        [JsonProperty("hour")]
         public int StartTimeHours
         {
             get { return _startTimeHours; }
             set { Set(ref _startTimeHours, value); }
         }
 
+        [JsonProperty("minute")]
         public int StartTimeMinutes
         {
             get { return _startTimeMinutes; }
             set { Set(ref _startTimeMinutes, value); }
         }
 
+        [JsonProperty("second")]
         public int StartTimeSeconds
         {
             get { return _startTimeSeconds; }
-            set
-            {
-                if (value == 60)
-                {
-                    value = 1;
-                    StartTimeMinutes++;
-                }
-
-                Set(ref _startTimeSeconds, value);
-            }
-        }
-
-        private int _deviationTimeMinute, _deviationTimeSecond;
-        public int DeviationTimeMinute
-        {
-            get { return _deviationTimeMinute; }
-            set { Set(ref _deviationTimeMinute, value); }
-        }
-
-        public int DeviationTimeSecond
-        {
-            get { return _deviationTimeSecond; }
-            set
-            {
-                if (value == 60)
-                {
-                    value = 1;
-                    DeviationTimeMinute++;
-                }
-
-                Set(ref _deviationTimeSecond, value);
-            }
+            set { Set(ref _startTimeSeconds, value); }
         }
 
         private int _maximumFrequency;
@@ -119,11 +101,11 @@ namespace DomainSetBidsApplication.ViewModels.Pages
             set { Set(ref _textMessage, value); }
         }
 
-        private string _register;
-        public string Register
+        private string _titleAddOrEditButton;
+        public string TitleAddOrEditButton
         {
-            get { return _register; }
-            set { Set(ref _register, value); }
+            get { return _titleAddOrEditButton; }
+            set { Set(ref _titleAddOrEditButton, value); }
         }
 
         public AddDomainPageViewModel(IRegDomainService regDomainService)
@@ -134,47 +116,71 @@ namespace DomainSetBidsApplication.ViewModels.Pages
 
             Cleanup();
 
-            AddCommand = new RelayCommand(async () => await AddCommandHandler());
+            TitleAddOrEditButton = "Add";
+
+            AddOrEditCommand = new RelayCommand(async () => await AddOrEditCommandHandler());
             RunCommand = new RelayCommand(async () => await RunCommandHandler());
+
+            MessengerInstance.Register<DetailsPageMessage>(this, DetailsPageMessageHandler);
         }
 
-        private void CreateEntity()
+        private void DetailsPageMessageHandler(DetailsPageMessage m)
+        {
+            Cleanup();
+
+            string code;
+            if (m.Parametrs.TryGetValue(ARG, out code))
+            {
+                JsonConvert.PopulateObject(code, this);
+
+                TitleAddOrEditButton = "Save";
+            }
+        }
+
+        private async Task<RegDomainEntity> CreateOrUpdateEntity()
         {
             var date = Date.AddHours(StartTimeHours).AddMinutes(StartTimeMinutes).AddSeconds(StartTimeSeconds);
 
-            _regDomainEntity = new RegDomainEntity
+            var regDomainEntity = new RegDomainEntity
             {
-                Name = DomainName,
-                Rate = Rate,
+                Name = Name,
                 Register = Register,
-                Date = date
+                Rate = Rate,
+                Frequency = Frequency,
+                Date = date,
+                Hour = StartTimeHours,
+                Minute = StartTimeMinutes,
+                Second = StartTimeSeconds
             };
+
+            if (Id == 0)
+            {
+                await _regDomainService.InsertAsync(regDomainEntity);
+            }
+            else
+            {
+                regDomainEntity.Id = Id;
+                await _regDomainService.UpdateAsync(regDomainEntity);
+            }
+
+            return regDomainEntity;
         }
 
-        private async Task AddCommandHandler()
+        private async Task AddOrEditCommandHandler()
         {
-            CreateEntity();
-
-            await _regDomainService.InsertAsync(_regDomainEntity);
-
-            MessengerInstance.Send(_regDomainEntity);
-
+            var entity = await CreateOrUpdateEntity();
+            
             Cleanup();
+            MessengerInstance.Send(entity);
 
-            TextMessage = "Domain had been added for register.";
+            TextMessage = "Domain has been added for register.";
         }
 
         private async Task RunCommandHandler()
         {
-            CreateEntity();
+            await AddOrEditCommandHandler();
 
-            await _regDomainService.InsertAsync(_regDomainEntity);
-
-            MessengerInstance.Send(_regDomainEntity);
-
-            Cleanup();
-
-            TextMessage = "Domain had been added and to start for register.";
+            TextMessage = "Domain has been added and to start for register.";
         }
 
         public override void Cleanup()
@@ -186,21 +192,20 @@ namespace DomainSetBidsApplication.ViewModels.Pages
 
             Register = Registers.First();
 
-            DomainName = String.Empty;
+            Name = String.Empty;
             Rate = 0;
 
             TickFrequency = 100;
 
             Frequency = 300;
 
-            StartTimeHours = 9;
-            StartTimeMinutes = 1;
-            StartTimeSeconds = 0;
-
-            DeviationTimeMinute = 0;
-            DeviationTimeSecond = 0;
-
             Date = DateTime.Now;
+
+            StartTimeHours = DateTime.Now.Hour;
+            StartTimeMinutes = DateTime.Now.Minute;
+            StartTimeSeconds = DateTime.Now.Second;
+
+            TextMessage = String.Empty;
         }
     }
 }
