@@ -17,6 +17,7 @@
                       NonActiveGlowBrush="Red"
                       RightWindowCommandsOverlayBehavior="HiddenTitleBar"
                       GlowBrush="{DynamicResource AccentColorBrush}"
+                      Icon="/DomainSetBidsApplication;component/fawicon.ico"
                       DataContext="{Binding Source={StaticResource Locator}, Path=Main}">
     
     <controls:MetroWindow.RightWindowCommands>
