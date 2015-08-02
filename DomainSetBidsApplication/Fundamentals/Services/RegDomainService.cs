@@ -60,35 +60,42 @@ namespace DomainSetBidsApplication.Fundamentals
                         {
                             await AddLog(regDomainEntity.Name, LogType.Info, inputData);
 
-                            int delay = 1000 / regDomainEntity.Frequency;
+                            var ts = regDomainEntity.Date - DateTime.Now;
+                            if (ts.Ticks < 0)
+                            {
+                                string msg = String.Format("Dates: {0} more {1}", DateTime.Now, regDomainEntity.Date);
+
+                                await AddLog(regDomainEntity.Name, LogType.Error, msg);
+
+                                return;
+                            }
+
+                            var timeSpanNow = new TimeSpan(DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+                            var timeSpanStart = new TimeSpan(regDomainEntity.Hour, regDomainEntity.Minute, regDomainEntity.Second);
+                            var delay = timeSpanStart - timeSpanNow;
+                            if (delay.TotalMilliseconds > 0)
+                            {
+                                await Task.Delay((int)delay.TotalMilliseconds);
+                            }
+
                             var result = new Result<DomainAnswer> { ResultQuery = "error" };
+                            int delayFrequency = 1000 / regDomainEntity.Frequency;
                             do
                             {
                                 token.ThrowIfCancellationRequested();
+                                await AddLog(regDomainEntity.Name, LogType.Error, result);
+                                await Task.Delay(delayFrequency);
 
-                                var dateNow = DateTime.Now;
-                                if (regDomainEntity.Date >= dateNow)
+                                result = await _apiFactory.Domain.SetReregBidsAsync(username, password, inputData);
+                                if (result.ResultType == ResultType.SUCCESS)
                                 {
-                                    await Task.Delay(delay);
-                                    result = await _apiFactory.Domain.SetReregBidsAsync(username, password, inputData);
-
-                                    if (result.ResultType == ResultType.SUCCESS)
-                                    {
-                                        await AddLog(regDomainEntity.Name, LogType.Success, result.Answer);
-                                    }
-                                    else
-                                    {
-                                        await AddLog(regDomainEntity.Name, LogType.Error, result);
-                                    }
+                                    await AddLog(regDomainEntity.Name, LogType.Success, result.Answer);
                                 }
-                                else if (regDomainEntity.Date < dateNow)
+                                else
                                 {
-                                    string msg = String.Format("Dates: {0} more {1}", regDomainEntity.Date, dateNow);
-
-                                    await AddLog(regDomainEntity.Name, LogType.Error, msg);
-
-                                    break;
+                                    await AddLog(regDomainEntity.Name, LogType.Error, result);
                                 }
+
                             } while (result.ResultType != ResultType.SUCCESS);
                         }, token);
 

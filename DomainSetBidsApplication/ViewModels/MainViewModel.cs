@@ -3,12 +3,12 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using System.Windows.Navigation;
 using AviaTicketsWpfApplication.Models;
 using DomainSetBidsApplication.Fundamentals;
 using DomainSetBidsApplication.Fundamentals.Interfaces;
 using DomainSetBidsApplication.Models;
+using DomainSetBidsApplication.Properties;
 using DomainSetBidsApplication.ViewModels.InteractionListeners;
 using DomainSetBidsApplication.ViewModels.Pages;
 using GalaSoft.MvvmLight;
@@ -174,7 +174,7 @@ namespace DomainSetBidsApplication.ViewModels
                 Logs = new ObservableCollection<LogEntity>();
                 Domains = new ObservableCollection<RegDomainViewModel>();
 
-                MessengerInstance.Register<RegDomainEntity>(this, async e => await RegDomainEntityMessageHandler(e));
+                MessengerInstance.Register<RegDomainEntity>(this, RegDomainEntityMessageHandler);
                 MessengerInstance.Register<LogEntity>(this, async e => await LogEntityMessageHandler(e));
             }
         }
@@ -219,7 +219,7 @@ namespace DomainSetBidsApplication.ViewModels
             return regDomainViewModel;
         }
 
-        private async Task RegDomainEntityMessageHandler(RegDomainEntity entity)
+        private void RegDomainEntityMessageHandler(RegDomainEntity entity)
         {
             if (entity != null)
             {
@@ -238,7 +238,14 @@ namespace DomainSetBidsApplication.ViewModels
         private async Task LogEntityMessageHandler(LogEntity entity)
         {
             await _logService.InsertAsync(entity);
-            await DispatcherHelper.RunAsync(() => Logs.Add(entity));
+            if (IsSelectedOnLog && SelectedItem.Entity.Name.Equals(entity.Name))
+            {
+                await DispatcherHelper.RunAsync(() => Logs.Add(entity));
+            }
+            else if (!IsSelectedOnLog)
+            {
+                await DispatcherHelper.RunAsync(() => Logs.Add(entity));
+            }
         }
 
         private void NavigatedCommandHandler(NavigationEventArgs args)
@@ -255,7 +262,7 @@ namespace DomainSetBidsApplication.ViewModels
 
                 if (dicParams.Count > 0)
                 {
-                    PageTitle = "Edit Domain";
+                    PageTitle = Resources.EditBid;
                     MessengerInstance.Send(new DetailsPageMessage { Parametrs = dicParams });
                 }
             }
@@ -280,7 +287,7 @@ namespace DomainSetBidsApplication.ViewModels
 
         private void AddCommandHandler()
         {
-            PageTitle = "Add Domain";
+            PageTitle = Resources.AddBid;
             MessengerInstance.Send(new PageMessage(typeof(AddDomainPageViewModel)));
         }        
 

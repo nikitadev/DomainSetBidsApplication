@@ -80,10 +80,10 @@ namespace DomainSetBidsApplication.ViewModels
             set { Set(ref _passport, value); }
         }
 
-        private DateTime _birthDate;
+        private DateTime? _birthDate;
 
         [JsonProperty("birth_date")]
-        public DateTime BirthDate
+        public DateTime? BirthDate
         {
             get { return _birthDate; }
             set { Set(ref _birthDate, value); }
@@ -137,8 +137,8 @@ namespace DomainSetBidsApplication.ViewModels
         {
             _userInfoService = userInfoService;
 
-            BirthDate = DateTime.Today;
-            Country = "RU";
+            //BirthDate = DateTime.Today;
+            //Country = "RU";
 
             PopulateCommand = new RelayCommand<string>(async (r) => await PopulateAsync(r));
 
@@ -158,10 +158,12 @@ namespace DomainSetBidsApplication.ViewModels
 
         private void ClearCommandHandler()
         {
-            Phone = Email = PersonAddress = PersonLocalName = Description = Person = Passport = String.Empty;
+            Phone = Email = PersonAddress = PersonLocalName = Description = Person = Passport = Country = String.Empty;
 
-            BirthDate = DateTime.Today;
-            Country = "RU";
+            //BirthDate = DateTime.Today;
+            //Country = "RU";
+
+            BirthDate = null;
         }
 
         private void PopulateTestLoginCommandHandler()
@@ -182,6 +184,7 @@ namespace DomainSetBidsApplication.ViewModels
             PersonAddress = contacts.PersonAddress;
             Phone = contacts.Phone;
             Email = contacts.Email;
+            Country = contacts.Country;
         }
 
         public async Task PopulateAsync(string register)
@@ -212,7 +215,7 @@ namespace DomainSetBidsApplication.ViewModels
                 Passport = Passport,
                 Email = Email,
                 Phone = Phone,
-                BirthDate = BirthDate,
+                BirthDate = BirthDate.Value,
                 Country = Country,
                 PersonAddress = PersonAddress
             };

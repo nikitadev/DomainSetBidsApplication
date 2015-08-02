@@ -5,34 +5,36 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:DomainSetBidsApplication.Views.Pages"
       xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+      xmlns:properties="clr-namespace:DomainSetBidsApplication.Properties"
       mc:Ignorable="d" 
       d:DesignHeight="300" d:DesignWidth="300"
-      Title="Add Domain"
       Template="{StaticResource PageControlTemplateKey}"
       DataContext="{Binding Source={StaticResource Locator}, Path=AddDomainPage}">
-    <StackPanel Width="300">
-        <TextBox Width="200"
+    <StackPanel Width="400">
+        <TextBox Width="300"
                  Margin="0, 10, 0, 0"
                  Text="{Binding Name}"
-                 controls:TextBoxHelper.Watermark="Domain name"
+                 ToolTip="{x:Static properties:Resources.DomainTooltip}"
                  controls:TextBoxHelper.IsWaitingForData="True"
-                 ToolTip="Enter domain name" />
-        <ComboBox Width="200"
+                 controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Domain}" />
+        <ComboBox Width="300"
                   Margin="0, 10, 0, 0"
+                  IsEditable="True"
                   SelectedItem="{Binding Register}"
-                  ItemsSource="{Binding Registers}" />
-        <TextBox Width="200"
+                  ItemsSource="{Binding Registers}"
+                  controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Register}" />
+        <TextBox Width="300"
                  Margin="0, 10, 0, 0"
-                 controls:TextBoxHelper.Watermark="Rate"
                  Text="{Binding Rate}"
-                 ToolTip="Enter rate" />
-        <DatePicker Width="200"
+                 ToolTip="{x:Static properties:Resources.RateTooltip}"
+                 controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Rate}" />
+        <DatePicker Width="300"
                     Margin="0, 10, 0, 0"
                     HorizontalAlignment="Center"
-                    SelectedDate="{Binding Date, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=True}"
-                    controls:TextBoxHelper.Watermark="Select a date" />
-        <StackPanel Width="250">
-            <Label Content="Start time" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                    controls:TextBoxHelper.Watermark="{x:Static properties:Resources.StartDate}"
+                    SelectedDate="{Binding Date, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=True}" />
+        <StackPanel Width="300">
+            <Label VerticalAlignment="Center" HorizontalAlignment="Center" Content="{x:Static properties:Resources.StartTime}" />
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -44,38 +46,28 @@
                 <controls:NumericUpDown Margin="5" Minimum="0" Maximum="60" Grid.Column="2" Value="{Binding StartTimeSeconds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             </Grid>
         </StackPanel>
-        <!--<StackPanel Width="210">
-            <Label Content="Deviation time" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center" />
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <controls:NumericUpDown Margin="5" Minimum="0" Maximum="60" Value="{Binding DeviationTimeMinute, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <controls:NumericUpDown Margin="5" Minimum="0" Maximum="60" Grid.Column="1" Value="{Binding DeviationTimeSecond, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-            </Grid>
-        </StackPanel>-->
-        <StackPanel Width="210">
-            <Label Content="Frequency request" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center" />
-            <Slider Margin="10"
-                    Minimum="1"
+        <StackPanel Width="300">
+            <Label VerticalAlignment="Center" 
+                   HorizontalAlignment="Center" 
+                   Content="{x:Static properties:Resources.FrequencyRequest}" />
+            <Slider Minimum="1"
                     AutoToolTipPlacement="TopLeft"
                     Maximum="{Binding MaximumFrequency}"
                     TickPlacement="BottomRight"
                     TickFrequency="{Binding TickFrequency}"
                     Value="{Binding Frequency}" />
         </StackPanel>
-        <StackPanel Width="220" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Width="300" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Width="80"
                     Margin="10"
                     Content="{Binding TitleAddOrEditButton}"
                     Command="{Binding AddOrEditCommand}"
                     Style="{DynamicResource AccentedSquareButtonStyle}" />
-            <Button Width="80"
+            <!--<Button Width="80"
                     Margin="10"
-                    Content="Run"
                     Command="{Binding RunCommand}"
-                    Style="{DynamicResource AccentedSquareButtonStyle}" />
+                    Content="{x:Static properties:Resources.}"
+                    Style="{DynamicResource AccentedSquareButtonStyle}" />-->
         </StackPanel>
         <Label Content="{Binding TextMessage}" HorizontalAlignment="Right" />
     </StackPanel>

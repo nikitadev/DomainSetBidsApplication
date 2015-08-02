@@ -8,6 +8,7 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"  
              xmlns:ei="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions"
              xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Platform"
+             xmlns:properties="clr-namespace:DomainSetBidsApplication.Properties"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="400">
     <Grid>
@@ -15,25 +16,31 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <controls:ToggleSwitch IsChecked="{Binding IsSelectedOnLog}"
-                                   OnLabel="Selected"
-                                   OffLabel="All"
-                                   Margin="10, 0, 0, 0" />
+        <Grid>
+            <Label HorizontalAlignment="Left"
+                   Content="{x:Static properties:Resources.Logs}" 
+                   Style="{StaticResource DescriptionHeaderStyleKey}"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <controls:ToggleSwitch Margin="10, 0, 0, 0"
+                                   IsChecked="{Binding IsSelectedOnLog}"
+                                   OnLabel="{x:Static properties:Resources.ShowSelectedItemLogs}"
+                                   OffLabel="{x:Static properties:Resources.ShowAllLogs}" />
             <Button Width="100"
                     Margin="5, 0"
-                    Content="Clear"
                     HorizontalAlignment="Right"
+                    Content="{x:Static properties:Resources.Clear}"
                     Command="{Binding ClearCommand}"
                     Style="{DynamicResource AccentedSquareButtonStyle}" />
         </StackPanel>
+        </Grid>
+        
         <ListBox Margin="5"
                  Grid.Row="1"
                  VirtualizingStackPanel.IsVirtualizing="True"
                  VirtualizingPanel.VirtualizationMode="Recycling"
                  ForceCursor="True"
-                 BorderBrush="{StaticResource AccentColorBrush}"
                  BorderThickness="1"
+                 BorderBrush="{StaticResource AccentColorBrush}"
                  ItemsSource="{Binding Logs}"
                  ItemTemplate="{StaticResource LogTemplateKey}" />
     </Grid>

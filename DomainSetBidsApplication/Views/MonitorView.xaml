@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:properties="clr-namespace:DomainSetBidsApplication.Properties"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
@@ -21,11 +22,11 @@
                     HorizontalAlignment="Left"
                     Command="{Binding ShowActionCommand}"
                     Style="{DynamicResource AccentedSquareButtonStyle}" />
-            <Button Width="100"
+            <Button Width="150"
                     Margin="5, 0"
-                    Content="Add"
                     HorizontalAlignment="Right"
                     Command="{Binding AddCommand}"
+                    Content="{x:Static properties:Resources.AddBid}"
                     Style="{DynamicResource AccentedSquareButtonStyle}" />
         </Grid>
         <ListView Margin="5"
@@ -36,14 +37,31 @@
                   SelectedItem="{Binding SelectedItem}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Name"
+                    <GridViewColumn Width="100" Header="{x:Static properties:Resources.Domain}"
                                     DisplayMemberBinding="{Binding Entity.Name}" />
-                    <GridViewColumn Header="Register"
+                    <GridViewColumn Width="100" Header="{x:Static properties:Resources.Register}"
                                     DisplayMemberBinding="{Binding Entity.Register}" />
-                    <GridViewColumn Header="Rate"
+                    <GridViewColumn Width="100" Header="{x:Static properties:Resources.Rate}"
                                     DisplayMemberBinding="{Binding Entity.Rate}" />
-                    <GridViewColumn Header="State"
+                    <GridViewColumn Width="100" Header="{x:Static properties:Resources.State}"
                                     DisplayMemberBinding="{Binding State}" />
+                    <GridViewColumn Width="100" Header="{x:Static properties:Resources.StartDate}"
+                                    DisplayMemberBinding="{Binding Entity.Date, StringFormat={}{0:dd.MM.yyyy}}" />
+                    <GridViewColumn Width="100" Header="{x:Static properties:Resources.StartTime}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0}:{1}:{2}">
+                                            <Binding Path="Entity.Hour" />
+                                            <Binding Path="Entity.Minute" />
+                                            <Binding Path="Entity.Second" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>

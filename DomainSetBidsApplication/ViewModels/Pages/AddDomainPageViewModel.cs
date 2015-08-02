@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DomainSetBidsApplication.Fundamentals.Interfaces;
 using DomainSetBidsApplication.Models;
+using DomainSetBidsApplication.Properties;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Newtonsoft.Json;
@@ -37,15 +38,15 @@ namespace DomainSetBidsApplication.ViewModels.Pages
             set { Set(ref _name, value); }
         }
 
-        private int _rate;
-        public int Rate
+        private int? _rate;
+        public int? Rate
         {
             get { return _rate; }
             set { Set(ref _rate, value); }
         }
 
-        private DateTime _date;
-        public DateTime Date
+        private DateTime? _date;
+        public DateTime? Date
         {
             get { return _date; }
             set { Set(ref _date, value); }
@@ -112,11 +113,12 @@ namespace DomainSetBidsApplication.ViewModels.Pages
         {
             _regDomainService = regDomainService;
 
-            MaximumFrequency = 1200;
+            MaximumFrequency = Settings.Default.MaximumFrequency;
+            TickFrequency = Settings.Default.TickFrequency;
 
             Cleanup();
 
-            TitleAddOrEditButton = "Add";
+            TitleAddOrEditButton = Resources.Add;
 
             AddOrEditCommand = new RelayCommand(async () => await AddOrEditCommandHandler());
             RunCommand = new RelayCommand(async () => await RunCommandHandler());
@@ -133,19 +135,19 @@ namespace DomainSetBidsApplication.ViewModels.Pages
             {
                 JsonConvert.PopulateObject(code, this);
 
-                TitleAddOrEditButton = "Save";
+                TitleAddOrEditButton = Resources.Save;
             }
         }
 
         private async Task<RegDomainEntity> CreateOrUpdateEntity()
         {
-            var date = Date.AddHours(StartTimeHours).AddMinutes(StartTimeMinutes).AddSeconds(StartTimeSeconds);
+            var date = Date.Value.AddHours(StartTimeHours).AddMinutes(StartTimeMinutes).AddSeconds(StartTimeSeconds);
 
             var regDomainEntity = new RegDomainEntity
             {
                 Name = Name,
                 Register = Register,
-                Rate = Rate,
+                Rate = Rate.Value,
                 Frequency = Frequency,
                 Date = date,
                 Hour = StartTimeHours,
@@ -190,16 +192,9 @@ namespace DomainSetBidsApplication.ViewModels.Pages
             var registers = Enum.GetNames(typeof(RegisterType));
             Registers = new List<string>(registers);
 
-            Register = Registers.First();
-
             Name = String.Empty;
-            Rate = 0;
 
-            TickFrequency = 100;
-
-            Frequency = 300;
-
-            Date = DateTime.Now;
+            Frequency = 10;
 
             StartTimeHours = DateTime.Now.Hour;
             StartTimeMinutes = DateTime.Now.Minute;

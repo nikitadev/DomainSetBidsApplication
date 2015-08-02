@@ -5,62 +5,73 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DomainSetBidsApplication.Views"
              xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:properties="clr-namespace:DomainSetBidsApplication.Properties"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="350" Margin="10">
     <StackPanel>
         <ComboBox Width="300"
                   Margin="10"
+                  IsEditable="True"
                   SelectedItem="{Binding Register}"
-                  ItemsSource="{Binding Registers}" />
+                  ItemsSource="{Binding Registers}"
+                  controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Register}" />
         <Grid Margin="10" Width="300">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <TextBox controls:TextBoxHelper.Watermark="Username"
-                     Text="{Binding Username}" />
+            <TextBox Text="{Binding Username}"
+                     controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Username}" />
             <TextBox Grid.Column="1"
                      Margin="10, 0, 0, 0" 
-                     controls:TextBoxHelper.Watermark="Password"
-                     Text="{Binding Password}" />
+                     Text="{Binding Password}"
+                     controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Password}" />
         </Grid>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Margin="10, 0" Width="80" Content="Test login" Command="{Binding PopulateTestLoginCommand}" Style="{DynamicResource AccentedSquareButtonStyle}" />
-            <Button Margin="10, 0" Width="80" Content="Check" Command="{Binding CheckCommand}" Style="{DynamicResource AccentedSquareButtonStyle}" />
+            <Button Margin="10, 0" 
+                    Content="{x:Static properties:Resources.PopulateTestData}" 
+                    Command="{Binding PopulateTestLoginCommand}" 
+                    Style="{DynamicResource AccentedSquareButtonStyle}" />
+            <Button Margin="10, 0" Width="80" 
+                    Content="{x:Static properties:Resources.Check}" 
+                    Command="{Binding CheckCommand}" 
+                    Style="{DynamicResource AccentedSquareButtonStyle}" />
         </StackPanel>
-        
         <Label Margin="10" Width="300">
             <TextBlock Text="{Binding CheckResult}" TextWrapping="WrapWithOverflow" />
         </Label>
         <Separator />
         <StackPanel Margin="10" Width="300">
-            <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="descr" Text="{Binding Description}" />
-            <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="person" Text="{Binding Person}" />
-            <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="person_r" Text="{Binding PersonLocalName}" />
-            <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="passport" Text="{Binding Passport}" />
+            <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Description}" Text="{Binding Description}" />
+            <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="{x:Static properties:Resources.PersonName}" Text="{Binding Person}" />
+            <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="{x:Static properties:Resources.PersonLocalName}" Text="{Binding PersonLocalName}" />
+            <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="{x:Static properties:Resources.PassportData}" Text="{Binding Passport}" />
             <DatePicker Margin="0, 10, 0, 0"
                         SelectedDate="{Binding BirthDate, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=True}"
-                        controls:TextBoxHelper.Watermark="birth_date" />
-            <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="p_addr" Text="{Binding PersonAddress}" />
-            <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="phone" Text="{Binding Phone}" />
-            <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="e_mail" Text="{Binding Email}" />
-            <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="country" Text="{Binding Country}" />
+                        controls:TextBoxHelper.Watermark="{x:Static properties:Resources.BirthDate}" />
+            <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="{x:Static properties:Resources.PersonAddress}" Text="{Binding PersonAddress}" />
+            <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Phone}" Text="{Binding Phone}" />
+            <TextBox Margin="0, 10, 0, 0" controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Email}" Text="{Binding Email}" />
+            <TextBox Margin="0, 10, 0, 0" 
+                     ToolTip="{x:Static properties:Resources.CountryToolTip}"
+                     controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Country}" 
+                     Text="{Binding Country}" />
         </StackPanel>
         <Separator />
+        <Button Margin="10"
+                HorizontalAlignment="Right"
+                Content="{x:Static properties:Resources.PopulateTestData}"
+                Command="{Binding PopulateTestDataCommand}"
+                Style="{DynamicResource AccentedSquareButtonStyle}" />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Width="80"
                     Margin="10"
-                    Content="Test data" 
-                    Command="{Binding PopulateTestDataCommand}"
-                    Style="{DynamicResource AccentedSquareButtonStyle}" />
-            <Button Width="80"
-                    Margin="10"
-                    Content="Clear" 
+                    Content="{x:Static properties:Resources.Clear}" 
                     Command="{Binding ClearCommand}"
                     Style="{DynamicResource AccentedSquareButtonStyle}" />
             <Button Width="80"
                     Margin="10"
-                    Content="Save"
+                    Content="{x:Static properties:Resources.Save}"
                     Command="{Binding SaveCommand}"
                     Style="{DynamicResource AccentedSquareButtonStyle}" />
         </StackPanel>

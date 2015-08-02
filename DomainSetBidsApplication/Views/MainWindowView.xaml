@@ -9,12 +9,13 @@
                       xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
                       xmlns:views="clr-namespace:DomainSetBidsApplication.Views"
                       xmlns:behaviors="clr-namespace:DomainSetBidsApplication.Behaviors"
+                      xmlns:properties="clr-namespace:DomainSetBidsApplication.Properties"
                       mc:Ignorable="d"
                       Title="Domain set bids" 
                       Height="550" Width="700"
-                      WindowStartupLocation="CenterScreen"
                       WindowState="Maximized"
                       NonActiveGlowBrush="Red"
+                      WindowStartupLocation="CenterScreen"
                       RightWindowCommandsOverlayBehavior="HiddenTitleBar"
                       GlowBrush="{DynamicResource AccentColorBrush}"
                       Icon="/DomainSetBidsApplication;component/fawicon.ico"
@@ -25,7 +26,7 @@
             <ToggleButton Content=""
                           FontSize="16"
                           FontFamily="Segoe UI Symbol"
-                          ToolTip="Settings"
+                          ToolTip="{x:Static properties:Resources.Settings}"
                           IsChecked="{Binding IsSettingsOpen}" />
         </controls:WindowCommands>
     </controls:MetroWindow.RightWindowCommands>
@@ -35,7 +36,7 @@
             <controls:Flyout x:Name="flyout"
                              IsModal="True"
                              Position="Right"
-                             Header="Settings"
+                             Header="{x:Static properties:Resources.Settings}"
                              IsOpen="{Binding IsSettingsOpen}">
                 <views:UserInfoSettingsView DataContext="{Binding UserInfo}" />
             </controls:Flyout>
@@ -43,8 +44,8 @@
                              Position="Bottom"
                              Height="70"
                              IsPinned="False"
-                             CloseButtonVisibility="Collapsed"
                              TitleVisibility="Collapsed"
+                             CloseButtonVisibility="Collapsed"
                              IsOpen="{Binding IsCommandBarOpen}">
                 <views:MonitorCommandBarView DataContext="{Binding SelectedItem.CommandBar}" />
             </controls:Flyout>
@@ -60,13 +61,17 @@
                 </Grid.RowDefinitions>
                 <Grid Margin="10">
                     <views:MonitorView DataContext="{Binding}" />
-                    <Border Background="WhiteSmoke" Opacity="0.8" Visibility="{Binding IsDataLoaded, Converter={StaticResource BooleanToVisibilityConverterKey}, UpdateSourceTrigger=PropertyChanged}" />
+                    <Border Background="WhiteSmoke" 
+                            Opacity="0.8" 
+                            Visibility="{Binding IsDataLoaded, Converter={StaticResource BooleanToVisibilityConverterKey}, UpdateSourceTrigger=PropertyChanged}" />
                     <controls:ProgressRing IsActive="True"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center"
                                            Visibility="{Binding IsDataLoaded, Converter={StaticResource BooleanToVisibilityConverterKey}, UpdateSourceTrigger=PropertyChanged}" />
                 </Grid>
-                <views:LoggingView Grid.Row="1" Margin="10" DataContext="{Binding}" />
+                <views:LoggingView Grid.Row="1" 
+                                   Margin="10" 
+                                   DataContext="{Binding}" />
             </Grid>
             <Frame x:Name="mainFrame" 
                    Grid.Row="1" Margin="10" 
