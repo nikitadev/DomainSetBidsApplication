@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using AviaTicketsWpfApplication.Models;
 using DomainSetBidsApplication.Models;
 using DomainSetBidsApplication.ViewModels.InteractionListeners;
 using DomainSetBidsApplication.ViewModels.Pages;
 using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Threading;
 
 namespace DomainSetBidsApplication.ViewModels
 {
@@ -13,8 +15,11 @@ namespace DomainSetBidsApplication.ViewModels
     {
         private readonly IRegDomainInteractionListener _regDomainInteractionListener;
 
+        private DispatcherTimer _timer;
         private CancellationTokenSource _cancellationTokenSource;
 
+        private TimeSpan _delayTime;
+        
         private RegDomainEntity _entity;
         public RegDomainEntity Entity
         {
@@ -29,6 +34,13 @@ namespace DomainSetBidsApplication.ViewModels
             set { Set(ref _state, value); }
         }
 
+        private string _delay;
+        public string Delay
+        {
+            get { return _delay; }
+            set { Set(ref _delay, value); }
+        }
+
         public MonitorCommandBarViewModel CommandBar { get; private set; }
 
         public RegDomainViewModel(IRegDomainInteractionListener regDomainInteractionListener)
@@ -38,31 +50,28 @@ namespace DomainSetBidsApplication.ViewModels
             CommandBar = new MonitorCommandBarViewModel(this);
         }
 
+        private void Tick(object sender, EventArgs e)
+        {
+            Delay = _delayTime.ToString("c");
+            if (_delayTime == TimeSpan.Zero)
+                _timer.Stop();
+
+            _delayTime = _delayTime.Add(TimeSpan.FromSeconds(-1));
+        }
+
+        public void StartTimer(TimeSpan timeSpan)
+        {
+            _delayTime = timeSpan;
+            _timer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Normal, Tick, DispatcherHelper.UIDispatcher);
+        }
+
         public async Task OnStartedAsync()
         {
             var tuple = await _regDomainInteractionListener.GetTaskAsync(Entity);
             if (tuple != null && tuple.Item1 != null)
             {
                 _cancellationTokenSource = tuple.Item2;
-
-                State = RegDomainMode.Work;
-                await tuple.Item1.ContinueWith(t =>
-                {
-                    if (t.IsCanceled)
-                    {
-                        State = RegDomainMode.Cancel;
-                    }
-                    else if (t.IsCompleted)
-                    {
-                        //var logEntity = new LogEntity { Name = SelectedItem.Entity.Name };
-                        //logEntity.Type = LogType.Success;
-
-                        //await DispatcherHelper.RunAsync(() => Logs.Add(logEntity));
-
-                        State = RegDomainMode.Done;
-                    }
-
-                }).ConfigureAwait(false);
+                await tuple.Item1.ContinueWith(t => State = t.IsCanceled ? RegDomainMode.Cancel : t.IsFaulted ? RegDomainMode.Draft : RegDomainMode.Done).ConfigureAwait(false);
             }
         }
 
@@ -70,6 +79,8 @@ namespace DomainSetBidsApplication.ViewModels
         {
             if (_cancellationTokenSource != null)
             {
+                if (_timer != null) _timer.Stop();
+
                 _cancellationTokenSource.Cancel();
             }
         }

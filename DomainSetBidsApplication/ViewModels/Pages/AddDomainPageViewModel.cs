@@ -18,7 +18,6 @@ namespace DomainSetBidsApplication.ViewModels.Pages
         private readonly IRegDomainService _regDomainService;
 
         public RelayCommand AddOrEditCommand { get; private set; }
-        public RelayCommand RunCommand { get; private set; }
 
         public List<string> Registers { get; set; }
 
@@ -52,24 +51,24 @@ namespace DomainSetBidsApplication.ViewModels.Pages
             set { Set(ref _date, value); }
         }
 
-        private int _startTimeHours, _startTimeMinutes, _startTimeSeconds;
+        private int? _startTimeHours, _startTimeMinutes, _startTimeSeconds;
 
         [JsonProperty("hour")]
-        public int StartTimeHours
+        public int? StartTimeHours
         {
             get { return _startTimeHours; }
             set { Set(ref _startTimeHours, value); }
         }
 
         [JsonProperty("minute")]
-        public int StartTimeMinutes
+        public int? StartTimeMinutes
         {
             get { return _startTimeMinutes; }
             set { Set(ref _startTimeMinutes, value); }
         }
 
         [JsonProperty("second")]
-        public int StartTimeSeconds
+        public int? StartTimeSeconds
         {
             get { return _startTimeSeconds; }
             set { Set(ref _startTimeSeconds, value); }
@@ -109,6 +108,24 @@ namespace DomainSetBidsApplication.ViewModels.Pages
             set { Set(ref _titleAddOrEditButton, value); }
         }
 
+        private bool _isNow;
+
+        [JsonIgnore]
+        public bool IsNow
+        {
+            get { return _isNow; }
+            set
+            {
+                if (value)
+                {
+                    Date = null;
+                    StartTimeHours = StartTimeMinutes = StartTimeSeconds = null;
+                }
+
+                Set(ref _isNow, value);
+            }
+        }
+
         public AddDomainPageViewModel(IRegDomainService regDomainService)
         {
             _regDomainService = regDomainService;
@@ -121,7 +138,6 @@ namespace DomainSetBidsApplication.ViewModels.Pages
             TitleAddOrEditButton = Resources.Add;
 
             AddOrEditCommand = new RelayCommand(async () => await AddOrEditCommandHandler());
-            RunCommand = new RelayCommand(async () => await RunCommandHandler());
 
             MessengerInstance.Register<DetailsPageMessage>(this, DetailsPageMessageHandler);
         }
@@ -135,21 +151,21 @@ namespace DomainSetBidsApplication.ViewModels.Pages
             {
                 JsonConvert.PopulateObject(code, this);
 
+                IsNow = !(Date.HasValue && StartTimeHours.HasValue && StartTimeMinutes.HasValue && StartTimeSeconds.HasValue);
+
                 TitleAddOrEditButton = Resources.Save;
             }
         }
 
         private async Task<RegDomainEntity> CreateOrUpdateEntity()
         {
-            var date = Date.Value.AddHours(StartTimeHours).AddMinutes(StartTimeMinutes).AddSeconds(StartTimeSeconds);
-
             var regDomainEntity = new RegDomainEntity
             {
                 Name = Name,
                 Register = Register,
                 Rate = Rate.Value,
                 Frequency = Frequency,
-                Date = date,
+                Date = Date,
                 Hour = StartTimeHours,
                 Minute = StartTimeMinutes,
                 Second = StartTimeSeconds
@@ -171,34 +187,43 @@ namespace DomainSetBidsApplication.ViewModels.Pages
         private async Task AddOrEditCommandHandler()
         {
             var entity = await CreateOrUpdateEntity();
-            
+
+            if (IsNow)
+            {
+                MessengerInstance.Send(entity, "now");
+            }
+            else
+            {
+                MessengerInstance.Send(entity);
+            }
+
             Cleanup();
-            MessengerInstance.Send(entity);
-
             TextMessage = "Domain has been added for register.";
-        }
-
-        private async Task RunCommandHandler()
-        {
-            await AddOrEditCommandHandler();
-
-            TextMessage = "Domain has been added and to start for register.";
         }
 
         public override void Cleanup()
         {
             base.Cleanup();
 
+            Id = 0;
+
+            IsNow = true;
+
             var registers = Enum.GetNames(typeof(RegisterType));
             Registers = new List<string>(registers);
+            Register = null;
 
             Name = String.Empty;
+            Date = null;
+            Rate = null;
 
             Frequency = 10;
 
-            StartTimeHours = DateTime.Now.Hour;
-            StartTimeMinutes = DateTime.Now.Minute;
-            StartTimeSeconds = DateTime.Now.Second;
+            //StartTimeHours = DateTime.Now.Hour;
+            //StartTimeMinutes = DateTime.Now.Minute;
+            //StartTimeSeconds = DateTime.Now.Second;
+
+            StartTimeHours = StartTimeMinutes = StartTimeSeconds = null;
 
             TextMessage = String.Empty;
         }

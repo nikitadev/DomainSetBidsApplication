@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using System.Windows.Navigation;
 using AviaTicketsWpfApplication.Models;
 using DomainSetBidsApplication.Fundamentals;
@@ -29,7 +30,7 @@ namespace DomainSetBidsApplication.ViewModels
     /// See http://www.galasoft.ch/mvvm
     /// </para>
     /// </summary>
-    public sealed class MainViewModel : ViewModelBase, IRegDomainInteractionListener
+    public sealed class MainViewModel : ViewModelBase, IRegDomainInteractionListener, IProgress<LogEntity>, IProgress<Tuple<int, RegDomainMode>>, IProgress<Tuple<int, TimeSpan>>
     {
         // TODO: убрать создание таблиц
         private readonly Bootstrapper _bootstraper;
@@ -42,12 +43,12 @@ namespace DomainSetBidsApplication.ViewModels
         public RelayCommand ContentUnloadedCommand { get; set; }
 
         public RelayCommand AddCommand { get; private set; }
-        public RelayCommand ShowActionCommand { get; private set; }
-
         public RelayCommand ClearCommand { get; private set; }
 
         public RelayCommand<NavigatingCancelEventArgs> NavigatingCommand { get; private set; }
         public RelayCommand<NavigationEventArgs> NavigatedCommand { get; private set; }
+
+        public RelayCommand<MouseButtonEventArgs> MouseDoubleClickCommand { get; private set; }
 
         private ObservableCollection<RegDomainViewModel> _domains;
         public ObservableCollection<RegDomainViewModel> Domains
@@ -104,11 +105,11 @@ namespace DomainSetBidsApplication.ViewModels
             set { Set(ref _isSettingsOpen, value); }
         }
 
-        private bool _isCommandBarOpen;
-        public bool IsCommandBarOpen
+        private bool _isCommandBarVisible;
+        public bool IsCommandBarVisible
         {
-            get { return _isCommandBarOpen; }
-            set { Set(ref _isCommandBarOpen, value); }
+            get { return _isCommandBarVisible; }
+            set { Set(ref _isCommandBarVisible, value); }
         }
 
         private UserInfoViewModel _userInfoViewModel;
@@ -124,15 +125,16 @@ namespace DomainSetBidsApplication.ViewModels
             get { return _selectedItem; }
             set
             {
-                if (value != null)
-                {
-                    IsCommandBarOpen = true;
-                }
-
+                IsCommandBarVisible = value != null;
                 Set(ref _selectedItem, value);
-
-                ShowActionCommand.RaiseCanExecuteChanged();
             }
+        }
+
+        private LogEntity _selectedItemLog;
+        public LogEntity SelectedItemLog
+        {
+            get { return _selectedItemLog; }
+            set { Set(ref _selectedItemLog, value); }
         }
 
         /// <summary>
@@ -153,28 +155,29 @@ namespace DomainSetBidsApplication.ViewModels
             if (IsInDesignMode)
             {
                 // Code runs in Blend --> create design time data.
-
             }
             else
             {
                 // Code runs "for real"
 
-                IsDataLoaded = IsFrameVisible = false;
+                IsDataLoaded = IsFrameVisible = IsCommandBarVisible = false;
 
                 ContentLoadedCommand = new RelayCommand(async () => await InitializeAsync());
                 ContentUnloadedCommand = new RelayCommand(async () => await ClearAsync());
 
                 AddCommand = new RelayCommand(AddCommandHandler);
                 ClearCommand = new RelayCommand(() => Logs.Clear());
-                ShowActionCommand = new RelayCommand(ShowActionCommandHandler, () => SelectedItem != null);
 
                 NavigatingCommand = new RelayCommand<NavigatingCancelEventArgs>(NavigatingCommandHandler);
                 NavigatedCommand = new RelayCommand<NavigationEventArgs>(NavigatedCommandHandler);
-                
-                Logs = new ObservableCollection<LogEntity>();
-                Domains = new ObservableCollection<RegDomainViewModel>();
 
-                MessengerInstance.Register<RegDomainEntity>(this, RegDomainEntityMessageHandler);
+                MouseDoubleClickCommand = new RelayCommand<MouseButtonEventArgs>(MouseDoubleClickCommandHandler, (a) => SelectedItem != null);
+
+                Logs = new ObservableCollection<LogEntity>();
+                Domains = new ObservableCollection<RegDomainViewModel>();       
+
+                MessengerInstance.Register<RegDomainEntity>(this, m => RegDomainEntityMessageHandler(m, false));
+                MessengerInstance.Register<RegDomainEntity>(this, "now", m => RegDomainEntityMessageHandler(m, true));
                 MessengerInstance.Register<LogEntity>(this, async e => await LogEntityMessageHandler(e));
             }
         }
@@ -203,11 +206,6 @@ namespace DomainSetBidsApplication.ViewModels
             IsDataLoaded = false;
         }
 
-        private void ShowActionCommandHandler()
-        {
-            IsCommandBarOpen = true;
-        }
-
         private RegDomainViewModel CreateRegDomainViewModel(RegDomainEntity entity)
         {
             var regDomainViewModel = new RegDomainViewModel(this)
@@ -219,18 +217,24 @@ namespace DomainSetBidsApplication.ViewModels
             return regDomainViewModel;
         }
 
-        private void RegDomainEntityMessageHandler(RegDomainEntity entity)
+        private void RegDomainEntityMessageHandler(RegDomainEntity entity, bool isNow)
         {
             if (entity != null)
             {
-                var vm = Domains.FirstOrDefault(e => e.Entity.Id == entity.Id);
-                if (vm != null)
+                var rdvm = Domains.FirstOrDefault(e => e.Entity.Id == entity.Id);
+                if (rdvm != null)
                 {
-                    vm.Entity = entity;
+                    rdvm.Entity = entity;
                 }
                 else
                 {
-                    Domains.Add(CreateRegDomainViewModel(entity));
+                    rdvm = CreateRegDomainViewModel(entity);
+                    Domains.Add(rdvm);
+                }
+
+                if (isNow)
+                {
+                    rdvm.CommandBar.StartCommand.Execute(null);
                 }
             }        
         }
@@ -281,15 +285,18 @@ namespace DomainSetBidsApplication.ViewModels
                     IsFrameVisible = false;
                 }
             }
-
-            IsCommandBarOpen = false;
         }
 
         private void AddCommandHandler()
         {
             PageTitle = Resources.AddBid;
             MessengerInstance.Send(new PageMessage(typeof(AddDomainPageViewModel)));
-        }        
+        }
+
+        private void MouseDoubleClickCommandHandler(MouseButtonEventArgs args)
+        {
+            SelectedItem.CommandBar.EditCommand.Execute(null);
+        }
 
         private async Task ClearAsync()
         {
@@ -301,7 +308,6 @@ namespace DomainSetBidsApplication.ViewModels
         public async Task OnDomainRemoveAsync(RegDomainEntity entity)
         {
             await _regDomainService.DeleteAsync(entity.Id);
-            IsCommandBarOpen = false;
 
             Domains.Remove(SelectedItem);
         }
@@ -309,12 +315,27 @@ namespace DomainSetBidsApplication.ViewModels
         public async Task<Tuple<Task, CancellationTokenSource>> GetTaskAsync(RegDomainEntity entity)
         {
             var userInfoEntity = await _userInfoService.GetByNameAsync(entity.Register);
-            if (userInfoEntity != null)
-            {
-                return _regDomainService.CreateTask(entity, userInfoEntity);
-            }
-
-            return null;
+            return _regDomainService.CreateTask(entity, userInfoEntity, this, this, this);
         }
+
+        public void Report(Tuple<int, RegDomainMode> tuple)
+        {
+            var domain = Domains.FirstOrDefault(d => d.Entity.Id == tuple.Item1);
+            if (domain != null) domain.State = tuple.Item2;
+        }
+
+        public void Report(Tuple<int, TimeSpan> tuple)
+        {
+            if (tuple.Item2 != TimeSpan.Zero)
+            {
+                var domain = Domains.FirstOrDefault(d => d.Entity.Id == tuple.Item1);
+                if (domain != null) domain.StartTimer(tuple.Item2);
+            }
+        }
+
+        public async void Report(LogEntity value)
+        {
+            await DispatcherHelper.RunAsync(() => MessengerInstance.Send(value));
+        }        
     }
 }

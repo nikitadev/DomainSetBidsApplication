@@ -4,8 +4,6 @@ using System.Threading.Tasks;
 using DomainSetBidsApplication.Fundamentals.Abstracts;
 using DomainSetBidsApplication.Fundamentals.Interfaces;
 using DomainSetBidsApplication.Models;
-using GalaSoft.MvvmLight.Messaging;
-using GalaSoft.MvvmLight.Threading;
 using Newtonsoft.Json;
 using RegAPI.Library;
 using RegAPI.Library.Models;
@@ -22,14 +20,22 @@ namespace DomainSetBidsApplication.Fundamentals
         {
         }
 
-        private async Task AddLog(string name, LogType type, object data)
+        private LogEntity CreateLog(RegDomainEntity regDomainEntity, LogType type, object data)
         {
-            var logEntity = new LogEntity { Name = name, Type = type, Date = DateTime.Now, Description = data.ToString() };
-
-            await DispatcherHelper.RunAsync(() => Messenger.Default.Send(logEntity));
+            return new LogEntity
+            {
+                Name = regDomainEntity.Name,
+                Register = regDomainEntity.Register,
+                Rate = regDomainEntity.Rate,
+                Type = type,
+                Date = DateTime.Now,
+                Description = data.ToString()
+            };           
         }
 
-        public Tuple<Task, CancellationTokenSource> CreateTask(RegDomainEntity regDomainEntity, UserInfoEntity userInfoEntity)
+        public Tuple<Task, CancellationTokenSource> CreateTask(
+            RegDomainEntity regDomainEntity, UserInfoEntity userInfoEntity, 
+            IProgress<Tuple<int, RegDomainMode>> progress, IProgress<Tuple<int, TimeSpan>> progressTimer, IProgress<LogEntity> progressLogs)
         {
             if (regDomainEntity != null)
             {
@@ -58,54 +64,63 @@ namespace DomainSetBidsApplication.Fundamentals
 
                         task = Task.Run(async () =>
                         {
-                            await AddLog(regDomainEntity.Name, LogType.Info, inputData);
+                            progress.Report(new Tuple<int, RegDomainMode>(regDomainEntity.Id, RegDomainMode.Pending));
+                            progressLogs.Report(CreateLog(regDomainEntity, LogType.Info, inputData));
 
-                            var ts = regDomainEntity.Date - DateTime.Now;
-                            if (ts.Ticks < 0)
+                            if (regDomainEntity.Date.HasValue)
                             {
-                                string msg = String.Format("Dates: {0} more {1}", DateTime.Now, regDomainEntity.Date);
+                                var fullDate = regDomainEntity.Date.Value;
+                                fullDate = fullDate.AddHours(regDomainEntity.Hour.Value).AddMinutes(regDomainEntity.Minute.Value).AddSeconds(regDomainEntity.Second.Value);
 
-                                await AddLog(regDomainEntity.Name, LogType.Error, msg);
+                                var ts = fullDate - DateTime.Now;
+                                if (ts.Ticks < 0)
+                                {
+                                    string msg = String.Format("Dates: {0} more {1}", DateTime.Now, regDomainEntity.Date);
 
-                                return;
+                                    progressLogs.Report(CreateLog(regDomainEntity, LogType.Error, inputData));
+
+                                    return;
+                                }
                             }
 
-                            var timeSpanNow = new TimeSpan(DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
-                            var timeSpanStart = new TimeSpan(regDomainEntity.Hour, regDomainEntity.Minute, regDomainEntity.Second);
-                            var delay = timeSpanStart - timeSpanNow;
-                            if (delay.TotalMilliseconds > 0)
+                            if (regDomainEntity.Hour.HasValue && regDomainEntity.Minute.HasValue && regDomainEntity.Second.HasValue)
                             {
-                                await Task.Delay((int)delay.TotalMilliseconds);
-                            }
+                                var timeSpanNow = new TimeSpan(DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+                                var timeSpanStart = new TimeSpan(regDomainEntity.Hour.Value, regDomainEntity.Minute.Value, regDomainEntity.Second.Value);
+                                var delay = timeSpanStart - timeSpanNow;
+
+                                progressTimer.Report(new Tuple<int, TimeSpan>(regDomainEntity.Id, delay));
+                                if (delay.TotalMilliseconds > 0) await Task.Delay((int)delay.TotalMilliseconds, token);
+                            }                            
 
                             var result = new Result<DomainAnswer> { ResultQuery = "error" };
                             int delayFrequency = 1000 / regDomainEntity.Frequency;
                             do
                             {
-                                token.ThrowIfCancellationRequested();
-                                await AddLog(regDomainEntity.Name, LogType.Error, result);
-                                await Task.Delay(delayFrequency);
+                                await Task.Yield();
 
+                                token.ThrowIfCancellationRequested();
+                                progress.Report(new Tuple<int, RegDomainMode>(regDomainEntity.Id, RegDomainMode.Working));
+                                
                                 result = await _apiFactory.Domain.SetReregBidsAsync(username, password, inputData);
                                 if (result.ResultType == ResultType.SUCCESS)
                                 {
-                                    await AddLog(regDomainEntity.Name, LogType.Success, result.Answer);
+                                    progressLogs.Report(CreateLog(regDomainEntity, LogType.Success, result.Answer));
                                 }
                                 else
                                 {
-                                    await AddLog(regDomainEntity.Name, LogType.Error, result);
+                                    progressLogs.Report(CreateLog(regDomainEntity, LogType.Error, result));
                                 }
+
+                                progress.Report(new Tuple<int, RegDomainMode>(regDomainEntity.Id, RegDomainMode.Pending));
+                                progressTimer.Report(new Tuple<int, TimeSpan>(regDomainEntity.Id, TimeSpan.FromMilliseconds(delayFrequency)));
+                                await Task.Delay(delayFrequency, token);
 
                             } while (result.ResultType != ResultType.SUCCESS);
                         }, token);
-
-                        break;
-                    case RegisterType.NIC:
-                        task = Task.Run(async () =>
-                        {
-                            await AddLog(regDomainEntity.Name, LogType.Error, "Not implemented yet.");
-                        }, token);
-
+                        break;                        
+                    default:
+                        task = Task.Run(() => progressLogs.Report(CreateLog(regDomainEntity, LogType.Error, "Not implemented yet.")), token);
                         break;
                 }
 

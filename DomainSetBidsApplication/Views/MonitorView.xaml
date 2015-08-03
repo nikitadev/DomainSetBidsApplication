@@ -3,7 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:ei="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions"
+             xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Platform"
              xmlns:properties="clr-namespace:DomainSetBidsApplication.Properties"
+             xmlns:views="clr-namespace:DomainSetBidsApplication.Views"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
@@ -13,21 +17,27 @@
         </Grid.RowDefinitions>
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <Button Width="100"
-                    Margin="5, 0"
-                    Content="Show action"
-                    HorizontalAlignment="Left"
-                    Command="{Binding ShowActionCommand}"
-                    Style="{DynamicResource AccentedSquareButtonStyle}" />
-            <Button Width="150"
-                    Margin="5, 0"
-                    HorizontalAlignment="Right"
+            <Button Width="50"
+                    Height="50"
                     Command="{Binding AddCommand}"
-                    Content="{x:Static properties:Resources.AddBid}"
-                    Style="{DynamicResource AccentedSquareButtonStyle}" />
+                    ToolTip="{x:Static properties:Resources.AddBid}"
+                    Style="{DynamicResource MetroCircleButtonStyle}">
+                <Rectangle Width="10"
+                           Height="10"
+                           Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
+                    <Rectangle.OpacityMask>
+                        <VisualBrush Stretch="Fill"
+                                 Visual="{DynamicResource appbar_add}" />
+                    </Rectangle.OpacityMask>
+                </Rectangle>
+            </Button>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Visibility="{Binding IsCommandBarVisible, Converter={StaticResource BooleanToVisibilityConverterKey}}">
+                <Separator Margin="5" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                <views:MonitorCommandBarView DataContext="{Binding SelectedItem.CommandBar}" />
+            </StackPanel>
         </Grid>
         <ListView Margin="5"
                   Grid.Row="1"
@@ -35,6 +45,16 @@
                   BorderBrush="{StaticResource AccentColorBrush}"
                   ItemsSource="{Binding Domains}"
                   SelectedItem="{Binding SelectedItem}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseDoubleClick">
+                    <cmd:EventToCommand Command="{Binding MouseDoubleClickCommand}" PassEventArgsToCommand="True" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}" BasedOn="{StaticResource {x:Type ListViewItem}}">
+                    <Setter Property="Foreground" Value="{Binding State, Converter={StaticResource RegDomainModeToBrushesConverter}}"/>
+                </Style>
+            </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView>
                     <GridViewColumn Width="100" Header="{x:Static properties:Resources.Domain}"
@@ -43,22 +63,62 @@
                                     DisplayMemberBinding="{Binding Entity.Register}" />
                     <GridViewColumn Width="100" Header="{x:Static properties:Resources.Rate}"
                                     DisplayMemberBinding="{Binding Entity.Rate}" />
-                    <GridViewColumn Width="100" Header="{x:Static properties:Resources.State}"
-                                    DisplayMemberBinding="{Binding State}" />
-                    <GridViewColumn Width="100" Header="{x:Static properties:Resources.StartDate}"
+                    <GridViewColumn Width="200" Header="{x:Static properties:Resources.StartDate}"
                                     DisplayMemberBinding="{Binding Entity.Date, StringFormat={}{0:dd.MM.yyyy}}" />
-                    <GridViewColumn Width="100" Header="{x:Static properties:Resources.StartTime}">
+                    <GridViewColumn Width="200" Header="{x:Static properties:Resources.StartTime}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock>
                                     <TextBlock.Text>
-                                        <MultiBinding StringFormat="{}{0}:{1}:{2}">
+                                        <MultiBinding StringFormat="{}{0}:{1:00}:{2:00}">
                                             <Binding Path="Entity.Hour" />
                                             <Binding Path="Entity.Minute" />
                                             <Binding Path="Entity.Second" />
                                         </MultiBinding>
                                     </TextBlock.Text>
                                 </TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Width="100" Header="{x:Static properties:Resources.State}"
+                                    DisplayMemberBinding="{Binding State}" />
+                    <GridViewColumn Width="200">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <ProgressBar x:Name="progressBar" Width="100" IsIndeterminate="True" Value="50" Visibility="Collapsed" />
+                                    <TextBlock x:Name="textBlock" Text="{Binding Delay}" Width="100" Visibility="Collapsed" />
+                                </Grid>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding State}" Value="Working">
+                                        <Setter TargetName="progressBar" Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding State}" Value="Pending">
+                                        <Setter TargetName="textBlock" Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                                <!--<ContentControl>
+                                    <ContentControl.Style>
+                                        <Style TargetType="{x:Type ContentControl}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding State}" Value="RegDomainMode.Working">
+                                                    <Setter Property="Content">
+                                                        <Setter.Value>
+                                                            
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding State}" Value="RegDomainMode.Pending">
+                                                    <Setter Property="Content">
+                                                        <Setter.Value>
+                                                            <TextBlock Text="{Binding Delay}" Width="100" />
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ContentControl.Style>
+                                </ContentControl>-->
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

@@ -21,19 +21,18 @@
                    Content="{x:Static properties:Resources.Logs}" 
                    Style="{StaticResource DescriptionHeaderStyleKey}"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <controls:ToggleSwitch Margin="10, 0, 0, 0"
+                <controls:ToggleSwitch Margin="10, 0, 0, 0"
                                    IsChecked="{Binding IsSelectedOnLog}"
                                    OnLabel="{x:Static properties:Resources.ShowSelectedItemLogs}"
                                    OffLabel="{x:Static properties:Resources.ShowAllLogs}" />
-            <Button Width="100"
+                <Button Width="100"
                     Margin="5, 0"
                     HorizontalAlignment="Right"
                     Content="{x:Static properties:Resources.Clear}"
                     Command="{Binding ClearCommand}"
                     Style="{DynamicResource AccentedSquareButtonStyle}" />
-        </StackPanel>
+            </StackPanel>
         </Grid>
-        
         <ListBox Margin="5"
                  Grid.Row="1"
                  VirtualizingStackPanel.IsVirtualizing="True"
@@ -42,6 +41,11 @@
                  BorderThickness="1"
                  BorderBrush="{StaticResource AccentColorBrush}"
                  ItemsSource="{Binding Logs}"
-                 ItemTemplate="{StaticResource LogTemplateKey}" />
+                 SelectedItem="{Binding SelectedItemLog}"
+                 ItemTemplate="{StaticResource LogTemplateKey}">
+            <ListBox.CommandBindings>
+                <CommandBinding Command="ApplicationCommands.Copy" Executed="CommandBinding_Executed" CanExecute="CommandBinding_CanExecute" />
+            </ListBox.CommandBindings>
+        </ListBox>
     </Grid>
 </UserControl>

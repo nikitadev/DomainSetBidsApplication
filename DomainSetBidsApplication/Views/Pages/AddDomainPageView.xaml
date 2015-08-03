@@ -28,12 +28,14 @@
                  Text="{Binding Rate}"
                  ToolTip="{x:Static properties:Resources.RateTooltip}"
                  controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Rate}" />
+        <CheckBox Width="300" Margin="0, 10, 0, 0" Content="{x:Static properties:Resources.Now}" IsChecked="{Binding IsNow}" />
         <DatePicker Width="300"
                     Margin="0, 10, 0, 0"
                     HorizontalAlignment="Center"
+                    Visibility="{Binding IsNow, Converter={StaticResource BooleanToVisibilityInvertConverterKey}}"
                     controls:TextBoxHelper.Watermark="{x:Static properties:Resources.StartDate}"
                     SelectedDate="{Binding Date, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=True}" />
-        <StackPanel Width="300">
+        <StackPanel Width="330" Visibility="{Binding IsNow, Converter={StaticResource BooleanToVisibilityInvertConverterKey}}">
             <Label VerticalAlignment="Center" HorizontalAlignment="Center" Content="{x:Static properties:Resources.StartTime}" />
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -41,9 +43,15 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <controls:NumericUpDown Margin="5" Minimum="0" Maximum="23" Value="{Binding StartTimeHours, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <controls:NumericUpDown Margin="5" Minimum="0" Maximum="60" Grid.Column="1" Value="{Binding StartTimeMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <controls:NumericUpDown Margin="5" Minimum="0" Maximum="60" Grid.Column="2" Value="{Binding StartTimeSeconds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <controls:NumericUpDown Margin="5" Minimum="0" Maximum="23" 
+                                        controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Hour}"
+                                        Value="{Binding StartTimeHours, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <controls:NumericUpDown Margin="5" Minimum="0" Maximum="60" Grid.Column="1" 
+                                        controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Minute}"
+                                        Value="{Binding StartTimeMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <controls:NumericUpDown Margin="5" Minimum="0" Maximum="60" Grid.Column="2" 
+                                        controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Second}"
+                                        Value="{Binding StartTimeSeconds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             </Grid>
         </StackPanel>
         <StackPanel Width="300">
@@ -57,18 +65,18 @@
                     TickFrequency="{Binding TickFrequency}"
                     Value="{Binding Frequency}" />
         </StackPanel>
-        <StackPanel Width="300" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Width="80"
-                    Margin="10"
-                    Content="{Binding TitleAddOrEditButton}"
-                    Command="{Binding AddOrEditCommand}"
-                    Style="{DynamicResource AccentedSquareButtonStyle}" />
-            <!--<Button Width="80"
-                    Margin="10"
-                    Command="{Binding RunCommand}"
-                    Content="{x:Static properties:Resources.}"
-                    Style="{DynamicResource AccentedSquareButtonStyle}" />-->
-        </StackPanel>
-        <Label Content="{Binding TextMessage}" HorizontalAlignment="Right" />
+        <Button Width="80"
+                Margin="40, 10"
+                HorizontalAlignment="Right"
+                Content="{Binding TitleAddOrEditButton}"
+                Command="{Binding AddOrEditCommand}"
+                Style="{DynamicResource AccentedSquareButtonStyle}" />
+        <controls:TransitioningContentControl Width="250"
+                                              Height="50"
+                                              Margin="0, 10, 0, 0"
+                                              Transition="Down"
+                                              HorizontalAlignment="Right"
+                                              Content="{Binding TextMessage}" />
+        <!--<Label Content="{Binding TextMessage}" HorizontalAlignment="Right" />-->
     </StackPanel>
 </Page>

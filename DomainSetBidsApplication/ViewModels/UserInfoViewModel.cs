@@ -137,9 +137,6 @@ namespace DomainSetBidsApplication.ViewModels
         {
             _userInfoService = userInfoService;
 
-            //BirthDate = DateTime.Today;
-            //Country = "RU";
-
             PopulateCommand = new RelayCommand<string>(async (r) => await PopulateAsync(r));
 
             var registers = Enum.GetNames(typeof(RegisterType));
@@ -159,9 +156,6 @@ namespace DomainSetBidsApplication.ViewModels
         private void ClearCommandHandler()
         {
             Phone = Email = PersonAddress = PersonLocalName = Description = Person = Passport = Country = String.Empty;
-
-            //BirthDate = DateTime.Today;
-            //Country = "RU";
 
             BirthDate = null;
         }

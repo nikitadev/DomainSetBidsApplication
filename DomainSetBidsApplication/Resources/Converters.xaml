@@ -6,5 +6,7 @@
     <c:BooleanToVisibilityInvertConverter x:Key="BooleanToVisibilityInvertConverterKey" />
     <c:StringToResourceConverter x:Key="StringToResourceConverterKey" />
     <c:BooleanInvertConverter x:Key="BooleanInvertConverterKey" />
+    <c:LogTypeToBrushesConverter x:Key="LogTypeToBrushesConverter" />
+    <c:RegDomainModeToBrushesConverter x:Key="RegDomainModeToBrushesConverter" />
     
 </ResourceDictionary>

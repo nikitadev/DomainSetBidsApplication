@@ -40,7 +40,7 @@
                              IsOpen="{Binding IsSettingsOpen}">
                 <views:UserInfoSettingsView DataContext="{Binding UserInfo}" />
             </controls:Flyout>
-            <controls:Flyout x:Name="appbar"
+            <!--<controls:Flyout x:Name="appbar"
                              Position="Bottom"
                              Height="70"
                              IsPinned="False"
@@ -48,7 +48,7 @@
                              CloseButtonVisibility="Collapsed"
                              IsOpen="{Binding IsCommandBarOpen}">
                 <views:MonitorCommandBarView DataContext="{Binding SelectedItem.CommandBar}" />
-            </controls:Flyout>
+            </controls:Flyout>-->
         </controls:FlyoutsControl>
     </controls:MetroWindow.Flyouts>
     

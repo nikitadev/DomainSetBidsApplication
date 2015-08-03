@@ -165,8 +165,17 @@
   <data name="FrequencyRequest" xml:space="preserve">
     <value>Количество попыток размещения в сек</value>
   </data>
+  <data name="Hour" xml:space="preserve">
+    <value>Часы</value>
+  </data>
   <data name="Logs" xml:space="preserve">
     <value>Логи</value>
+  </data>
+  <data name="Minute" xml:space="preserve">
+    <value>Минуты</value>
+  </data>
+  <data name="Now" xml:space="preserve">
+    <value>Сейчас</value>
   </data>
   <data name="PassportData" xml:space="preserve">
     <value>Паспортные данные</value>
@@ -203,6 +212,9 @@
   </data>
   <data name="Save" xml:space="preserve">
     <value>Сохранить</value>
+  </data>
+  <data name="Second" xml:space="preserve">
+    <value>Секунды</value>
   </data>
   <data name="Settings" xml:space="preserve">
     <value>Настройки</value>

@@ -1,4 +1,4 @@
 ﻿namespace DomainSetBidsApplication.Models
 {
-    public enum RegDomainMode { Done, Pending, Work, Draft, Cancel }
+    public enum RegDomainMode { None, Draft, Done, Cancel, Pending, Working }
 }
