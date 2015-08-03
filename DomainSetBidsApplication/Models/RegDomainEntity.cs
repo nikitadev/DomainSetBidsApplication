@@ -16,5 +16,7 @@ namespace DomainSetBidsApplication.Models
         public int? Minute { get; set; }
 
         public int? Second { get; set; }
+
+        public RegDomainMode State { get; set; }
     }
 }

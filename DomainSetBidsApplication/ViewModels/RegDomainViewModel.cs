@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Threading;
 using AviaTicketsWpfApplication.Models;
 using DomainSetBidsApplication.Models;
 using DomainSetBidsApplication.ViewModels.InteractionListeners;
@@ -15,7 +14,7 @@ namespace DomainSetBidsApplication.ViewModels
     {
         private readonly IRegDomainInteractionListener _regDomainInteractionListener;
 
-        private DispatcherTimer _timer;
+        private bool _isTimerStop;
         private CancellationTokenSource _cancellationTokenSource;
 
         private TimeSpan _delayTime;
@@ -24,14 +23,22 @@ namespace DomainSetBidsApplication.ViewModels
         public RegDomainEntity Entity
         {
             get { return _entity; }
-            set { Set(ref _entity, value); }
+            set
+            {
+                Set(ref _entity, value);
+                RaisePropertyChanged(() => State);
+            }
         }
 
         private RegDomainMode _state;
         public RegDomainMode State
         {
-            get { return _state; }
-            set { Set(ref _state, value); }
+            get { return Entity.State; }
+            set
+            {
+                Set(ref _state, value);
+                Entity.State = value;
+            }
         }
 
         private string _delay;
@@ -50,19 +57,29 @@ namespace DomainSetBidsApplication.ViewModels
             CommandBar = new MonitorCommandBarViewModel(this);
         }
 
-        private void Tick(object sender, EventArgs e)
+        private void Tick()
         {
-            Delay = _delayTime.ToString("c");
-            if (_delayTime == TimeSpan.Zero)
-                _timer.Stop();
+            DispatcherHelper.CheckBeginInvokeOnUI(() => Delay = _delayTime.ToString("c"));
+            _isTimerStop = _delayTime == TimeSpan.Zero;
 
             _delayTime = _delayTime.Add(TimeSpan.FromSeconds(-1));
         }
 
-        public void StartTimer(TimeSpan timeSpan)
+        public async Task StartTimer(TimeSpan timeSpan)
         {
             _delayTime = timeSpan;
-            _timer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Normal, Tick, DispatcherHelper.UIDispatcher);
+
+            var oneSecond = TimeSpan.FromSeconds(1);
+            await Task.Run(async () => 
+            {
+                do
+                {
+                    await Task.Delay((int)oneSecond.TotalMilliseconds);
+
+                    Tick();
+
+                } while (!_isTimerStop);
+            });
         }
 
         public async Task OnStartedAsync()
@@ -75,11 +92,16 @@ namespace DomainSetBidsApplication.ViewModels
             }
         }
 
+        public bool CanStarted()
+        {
+            return State != RegDomainMode.Done;
+        }
+
         public void OnStoped()
         {
             if (_cancellationTokenSource != null)
             {
-                if (_timer != null) _timer.Stop();
+                _isTimerStop = true;
 
                 _cancellationTokenSource.Cancel();
             }

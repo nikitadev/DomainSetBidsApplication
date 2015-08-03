@@ -27,7 +27,7 @@ namespace DomainSetBidsApplication.ViewModels
 
             _isStartCommandPressed = false;
 
-            StartCommand = new RelayCommand(async () => await StartCommandHandler(), () => !_isStartCommandPressed);
+            StartCommand = new RelayCommand(async () => await StartCommandHandler(), () => !_isStartCommandPressed && _monitorCommandBarInteractionListener.CanStarted());
             StopCommand = new RelayCommand(StopCommandHandler, () => _isStartCommandPressed);
             EditCommand = new RelayCommand(EditCommandHandler, () => !_isStartCommandPressed);
             DeleteCommand = new RelayCommand(async () => await DeleteCommandHandler(), () => !_isStartCommandPressed);

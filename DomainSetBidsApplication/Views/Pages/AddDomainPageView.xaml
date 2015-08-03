@@ -46,10 +46,10 @@
                 <controls:NumericUpDown Margin="5" Minimum="0" Maximum="23" 
                                         controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Hour}"
                                         Value="{Binding StartTimeHours, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <controls:NumericUpDown Margin="5" Minimum="0" Maximum="60" Grid.Column="1" 
+                <controls:NumericUpDown Margin="5" Minimum="0" Maximum="59" Grid.Column="1" 
                                         controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Minute}"
                                         Value="{Binding StartTimeMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <controls:NumericUpDown Margin="5" Minimum="0" Maximum="60" Grid.Column="2" 
+                <controls:NumericUpDown Margin="5" Minimum="0" Maximum="59" Grid.Column="2" 
                                         controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Second}"
                                         Value="{Binding StartTimeSeconds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             </Grid>

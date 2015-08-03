@@ -168,7 +168,8 @@ namespace DomainSetBidsApplication.ViewModels.Pages
                 Date = Date,
                 Hour = StartTimeHours,
                 Minute = StartTimeMinutes,
-                Second = StartTimeSeconds
+                Second = StartTimeSeconds,
+                State = RegDomainMode.Draft
             };
 
             if (Id == 0)
@@ -198,7 +199,9 @@ namespace DomainSetBidsApplication.ViewModels.Pages
             }
 
             Cleanup();
-            TextMessage = "Domain has been added for register.";
+            TextMessage = IsNow 
+                ? "Domain was started for register now."  
+                : "Domain has been added for register.";
         }
 
         public override void Cleanup()

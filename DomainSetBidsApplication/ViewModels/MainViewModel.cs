@@ -200,7 +200,14 @@ namespace DomainSetBidsApplication.ViewModels
             foreach (var entity in entities)
             {
                 await Task.Yield();
-                await DispatcherHelper.RunAsync(() => Domains.Add(CreateRegDomainViewModel(entity)));
+
+                var viewModel = CreateRegDomainViewModel(entity);
+                await DispatcherHelper.RunAsync(() => Domains.Add(viewModel));
+
+                if (viewModel.State == RegDomainMode.Working || viewModel.State == RegDomainMode.Pending)
+                {
+                    viewModel.CommandBar.StartCommand.Execute(null);
+                }
             }
 
             IsDataLoaded = false;
@@ -208,11 +215,11 @@ namespace DomainSetBidsApplication.ViewModels
 
         private RegDomainViewModel CreateRegDomainViewModel(RegDomainEntity entity)
         {
-            var regDomainViewModel = new RegDomainViewModel(this)
-            {
-                Entity = entity,
-                State = RegDomainMode.Draft
-            };
+            var regDomainViewModel = new RegDomainViewModel(this) { Entity = entity };
+            //{
+            //    Entity = entity,
+            //    State = RegDomainMode.Draft
+            //};
 
             return regDomainViewModel;
         }
@@ -229,6 +236,7 @@ namespace DomainSetBidsApplication.ViewModels
                 else
                 {
                     rdvm = CreateRegDomainViewModel(entity);
+
                     Domains.Add(rdvm);
                 }
 
@@ -324,18 +332,28 @@ namespace DomainSetBidsApplication.ViewModels
             if (domain != null) domain.State = tuple.Item2;
         }
 
-        public void Report(Tuple<int, TimeSpan> tuple)
+        public async void Report(Tuple<int, TimeSpan> tuple)
         {
             if (tuple.Item2 != TimeSpan.Zero)
             {
                 var domain = Domains.FirstOrDefault(d => d.Entity.Id == tuple.Item1);
-                if (domain != null) domain.StartTimer(tuple.Item2);
+                if (domain != null) await domain.StartTimer(tuple.Item2);
             }
         }
 
         public async void Report(LogEntity value)
         {
             await DispatcherHelper.RunAsync(() => MessengerInstance.Send(value));
-        }        
+        }
+
+        public override void Cleanup()
+        {
+            base.Cleanup();
+
+            foreach (var viewModel in Domains.Where(d => d.State == RegDomainMode.Working || d.State == RegDomainMode.Pending))
+            {
+                viewModel.CommandBar.StopCommand.Execute(null);
+            }
+        }
     }
 }
