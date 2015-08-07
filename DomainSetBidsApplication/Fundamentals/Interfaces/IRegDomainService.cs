@@ -10,7 +10,7 @@ namespace DomainSetBidsApplication.Fundamentals.Interfaces
         Tuple<Task, CancellationTokenSource> CreateTask(
             RegDomainEntity regDomainentity, 
             UserInfoEntity userInfoEntity,
-            IProgress<Tuple<int, RegDomainMode>> progress,
+            IProgress<Tuple<int, RegDomainState>> progress,
             IProgress<Tuple<int, TimeSpan>> progressTimer,
             IProgress<LogEntity> progressLogs);
     }

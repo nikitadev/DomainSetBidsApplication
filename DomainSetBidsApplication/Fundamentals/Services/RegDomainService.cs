@@ -35,7 +35,7 @@ namespace DomainSetBidsApplication.Fundamentals
 
         public Tuple<Task, CancellationTokenSource> CreateTask(
             RegDomainEntity regDomainEntity, UserInfoEntity userInfoEntity, 
-            IProgress<Tuple<int, RegDomainMode>> progress, IProgress<Tuple<int, TimeSpan>> progressTimer, IProgress<LogEntity> progressLogs)
+            IProgress<Tuple<int, RegDomainState>> progress, IProgress<Tuple<int, TimeSpan>> progressTimer, IProgress<LogEntity> progressLogs)
         {
             if (regDomainEntity != null)
             {
@@ -64,7 +64,7 @@ namespace DomainSetBidsApplication.Fundamentals
 
                         task = Task.Run(async () =>
                         {
-                            progress.Report(new Tuple<int, RegDomainMode>(regDomainEntity.Id, RegDomainMode.Pending));
+                            progress.Report(new Tuple<int, RegDomainState>(regDomainEntity.Id, RegDomainState.Pending));
                             progressLogs.Report(CreateLog(regDomainEntity, LogType.Info, inputData));
 
                             if (regDomainEntity.Date.HasValue)
@@ -75,11 +75,10 @@ namespace DomainSetBidsApplication.Fundamentals
                                 var ts = fullDate - DateTime.Now;
                                 if (ts.Ticks < 0)
                                 {
-                                    string msg = String.Format("Dates: {0} more {1}", DateTime.Now, regDomainEntity.Date);
+                                    string msg = String.Format("Expired date {0:dd.MM.yyyy}", regDomainEntity.Date);
+                                    progressLogs.Report(CreateLog(regDomainEntity, LogType.Error, msg));
 
-                                    progressLogs.Report(CreateLog(regDomainEntity, LogType.Error, inputData));
-
-                                    return;
+                                    throw new TimeoutException();
                                 }
                             }
 
@@ -100,7 +99,7 @@ namespace DomainSetBidsApplication.Fundamentals
                                 await Task.Yield();
 
                                 token.ThrowIfCancellationRequested();
-                                progress.Report(new Tuple<int, RegDomainMode>(regDomainEntity.Id, RegDomainMode.Working));
+                                progress.Report(new Tuple<int, RegDomainState>(regDomainEntity.Id, RegDomainState.Working));
                                 
                                 result = await _apiFactory.Domain.SetReregBidsAsync(username, password, inputData);
                                 if (result.ResultType == ResultType.SUCCESS)
@@ -112,8 +111,8 @@ namespace DomainSetBidsApplication.Fundamentals
                                     progressLogs.Report(CreateLog(regDomainEntity, LogType.Error, result));
                                 }
 
-                                progress.Report(new Tuple<int, RegDomainMode>(regDomainEntity.Id, RegDomainMode.Pending));
-                                progressTimer.Report(new Tuple<int, TimeSpan>(regDomainEntity.Id, TimeSpan.FromMilliseconds(delayFrequency)));
+                                //progress.Report(new Tuple<int, RegDomainState>(regDomainEntity.Id, RegDomainState.Pending));
+                                //progressTimer.Report(new Tuple<int, TimeSpan>(regDomainEntity.Id, TimeSpan.FromMilliseconds(delayFrequency)));
                                 await Task.Delay(delayFrequency, token);
 
                             } while (result.ResultType != ResultType.SUCCESS);

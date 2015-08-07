@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using DomainSetBidsApplication.Fundamentals.Interfaces;
 using DomainSetBidsApplication.Models;
 using DomainSetBidsApplication.Properties;
+using DomainSetBidsApplication.Utils;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Newtonsoft.Json;
@@ -17,7 +18,9 @@ namespace DomainSetBidsApplication.ViewModels.Pages
 
         private readonly IRegDomainService _regDomainService;
 
-        public RelayCommand AddOrEditCommand { get; private set; }
+        public RelayCommand ClearCommand { get; private set; }
+        public RelayCommand RunCommand { get; private set; }
+        public RelayCommand SaveCommand { get; private set; }
 
         public List<string> Registers { get; set; }
 
@@ -101,13 +104,6 @@ namespace DomainSetBidsApplication.ViewModels.Pages
             set { Set(ref _textMessage, value); }
         }
 
-        private string _titleAddOrEditButton;
-        public string TitleAddOrEditButton
-        {
-            get { return _titleAddOrEditButton; }
-            set { Set(ref _titleAddOrEditButton, value); }
-        }
-
         private bool _isNow;
 
         [JsonIgnore]
@@ -135,10 +131,10 @@ namespace DomainSetBidsApplication.ViewModels.Pages
 
             Cleanup();
 
-            TitleAddOrEditButton = Resources.Add;
-
-            AddOrEditCommand = new RelayCommand(async () => await AddOrEditCommandHandler());
-
+            ClearCommand = new RelayCommand(async () => await ClearCommandHandler());
+            RunCommand = new RelayCommand(async () => await RunCommandHandler());
+            SaveCommand = new RelayCommand(async () => await SaveCommandHandler());
+            
             MessengerInstance.Register<DetailsPageMessage>(this, DetailsPageMessageHandler);
         }
 
@@ -152,10 +148,8 @@ namespace DomainSetBidsApplication.ViewModels.Pages
                 JsonConvert.PopulateObject(code, this);
 
                 IsNow = !(Date.HasValue && StartTimeHours.HasValue && StartTimeMinutes.HasValue && StartTimeSeconds.HasValue);
-
-                TitleAddOrEditButton = Resources.Save;
             }
-        }
+        }  
 
         private async Task<RegDomainEntity> CreateOrUpdateEntity()
         {
@@ -169,7 +163,7 @@ namespace DomainSetBidsApplication.ViewModels.Pages
                 Hour = StartTimeHours,
                 Minute = StartTimeMinutes,
                 Second = StartTimeSeconds,
-                State = RegDomainMode.Draft
+                State = RegDomainState.Draft
             };
 
             if (Id == 0)
@@ -185,23 +179,30 @@ namespace DomainSetBidsApplication.ViewModels.Pages
             return regDomainEntity;
         }
 
-        private async Task AddOrEditCommandHandler()
+        private async Task ClearCommandHandler()
+        {
+            await SaveCommandHandler();
+
+            Cleanup();
+
+            TextMessage = Resources.ClearedMessage;
+        }
+
+        private async Task RunCommandHandler()
         {
             var entity = await CreateOrUpdateEntity();
 
-            if (IsNow)
-            {
-                MessengerInstance.Send(entity, "now");
-            }
-            else
-            {
-                MessengerInstance.Send(entity);
-            }
+            MessengerInstance.Send(entity, MessageToken.RUN);
+            MessengerInstance.Send(true, MessageToken.PAGE_GO_BACK);
+        }
 
-            Cleanup();
-            TextMessage = IsNow 
-                ? "Domain was started for register now."  
-                : "Domain has been added for register.";
+        private async Task SaveCommandHandler()
+        {
+            var entity = await CreateOrUpdateEntity();
+
+            MessengerInstance.Send(entity);
+
+            TextMessage = Resources.SavedMessage; 
         }
 
         public override void Cleanup()

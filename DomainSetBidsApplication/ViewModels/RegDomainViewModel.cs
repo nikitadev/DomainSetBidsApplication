@@ -16,8 +16,6 @@ namespace DomainSetBidsApplication.ViewModels
 
         private bool _isTimerStop;
         private CancellationTokenSource _cancellationTokenSource;
-
-        private TimeSpan _delayTime;
         
         private RegDomainEntity _entity;
         public RegDomainEntity Entity
@@ -30,15 +28,22 @@ namespace DomainSetBidsApplication.ViewModels
             }
         }
 
-        private RegDomainMode _state;
-        public RegDomainMode State
+        private RegDomainState _state;
+        public RegDomainState State
         {
             get { return Entity.State; }
             set
             {
                 Set(ref _state, value);
                 Entity.State = value;
+
+                RaisePropertyChanged(() => StateLocalName);
             }
+        }
+
+        public string StateLocalName
+        {
+            get { return State.ToLocalString(); }
         }
 
         private string _delay;
@@ -59,24 +64,25 @@ namespace DomainSetBidsApplication.ViewModels
 
         private void Tick()
         {
-            DispatcherHelper.CheckBeginInvokeOnUI(() => Delay = _delayTime.ToString("c"));
-            _isTimerStop = _delayTime == TimeSpan.Zero;
-
-            _delayTime = _delayTime.Add(TimeSpan.FromSeconds(-1));
+            
         }
 
         public async Task StartTimer(TimeSpan timeSpan)
         {
-            _delayTime = timeSpan;
+            var delayTime = timeSpan;
 
             var oneSecond = TimeSpan.FromSeconds(1);
+            var oneBackSecond = TimeSpan.FromSeconds(-1);
             await Task.Run(async () => 
             {
                 do
                 {
                     await Task.Delay((int)oneSecond.TotalMilliseconds);
 
-                    Tick();
+                    delayTime = delayTime.Add(oneBackSecond);
+                    await DispatcherHelper.RunAsync(() => Delay = delayTime.ToString("c"));
+
+                    _isTimerStop = delayTime == TimeSpan.Zero;
 
                 } while (!_isTimerStop);
             });
@@ -88,13 +94,19 @@ namespace DomainSetBidsApplication.ViewModels
             if (tuple != null && tuple.Item1 != null)
             {
                 _cancellationTokenSource = tuple.Item2;
-                await tuple.Item1.ContinueWith(t => State = t.IsCanceled ? RegDomainMode.Cancel : t.IsFaulted ? RegDomainMode.Draft : RegDomainMode.Done).ConfigureAwait(false);
+                await tuple.Item1.ContinueWith(t => 
+                    State = t.IsCanceled ? RegDomainState.Cancel 
+                        : t.IsFaulted ? RegDomainState.None 
+                        : RegDomainState.Done
+                ).ConfigureAwait(false);
+
+                await _regDomainInteractionListener.OnSaveStateAsync(Entity);
             }
         }
 
         public bool CanStarted()
         {
-            return State != RegDomainMode.Done;
+            return State != RegDomainState.Done;
         }
 
         public void OnStoped()
@@ -117,6 +129,11 @@ namespace DomainSetBidsApplication.ViewModels
         public async Task OnDeletedAsync()
         {
             await _regDomainInteractionListener.OnDomainRemoveAsync(Entity);
+        }
+
+        public override string ToString()
+        {
+            return Entity.ToString();
         }
     }
 }

@@ -159,11 +159,13 @@
     <Compile Include="Models\LogType.cs" />
     <Compile Include="Models\PageMessage.cs" />
     <Compile Include="Models\RegDomainEntity.cs" />
-    <Compile Include="Models\RegDomainMode.cs" />
+    <Compile Include="Models\RegDomainState.cs" />
     <Compile Include="Models\RegisterType.cs" />
     <Compile Include="Models\UserInfoEntity.cs" />
     <Compile Include="SQLite.cs" />
     <Compile Include="SQLiteAsync.cs" />
+    <Compile Include="Utils\FrameworkElement.extensions.cs" />
+    <Compile Include="Utils\MessageToken.cs" />
     <Compile Include="ViewModels\InteractionListeners\IRegDomainInteractionListener.cs" />
     <Compile Include="ViewModels\InteractionListeners\IMonitorCommandBarInteractionListener.cs" />
     <Compile Include="ViewModels\LoggingViewModel.cs" />

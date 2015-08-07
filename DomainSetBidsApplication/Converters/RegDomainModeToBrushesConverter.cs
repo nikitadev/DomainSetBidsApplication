@@ -6,22 +6,22 @@ using DomainSetBidsApplication.Models;
 
 namespace DomainSetBidsApplication.Converters
 {
-    [ValueConversion(typeof(RegDomainMode), typeof(Brushes))]
+    [ValueConversion(typeof(RegDomainState), typeof(Brushes))]
     public sealed class RegDomainModeToBrushesConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            var type = (RegDomainMode)value;
+            var type = (RegDomainState)value;
 
             switch (type)
             {
-                case RegDomainMode.Cancel:
+                case RegDomainState.Cancel:
                     return Brushes.Red;
-                case RegDomainMode.Draft:
+                case RegDomainState.Draft:
                     return Brushes.DarkSlateGray;
-                case RegDomainMode.Done:
+                case RegDomainState.Done:
                     return Brushes.Green;
-                case RegDomainMode.Pending:
+                case RegDomainState.Pending:
                     return Brushes.SandyBrown;
             }
 

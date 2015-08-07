@@ -10,6 +10,7 @@ using DomainSetBidsApplication.Fundamentals;
 using DomainSetBidsApplication.Fundamentals.Interfaces;
 using DomainSetBidsApplication.Models;
 using DomainSetBidsApplication.Properties;
+using DomainSetBidsApplication.Utils;
 using DomainSetBidsApplication.ViewModels.InteractionListeners;
 using DomainSetBidsApplication.ViewModels.Pages;
 using GalaSoft.MvvmLight;
@@ -30,7 +31,7 @@ namespace DomainSetBidsApplication.ViewModels
     /// See http://www.galasoft.ch/mvvm
     /// </para>
     /// </summary>
-    public sealed class MainViewModel : ViewModelBase, IRegDomainInteractionListener, IProgress<LogEntity>, IProgress<Tuple<int, RegDomainMode>>, IProgress<Tuple<int, TimeSpan>>
+    public sealed class MainViewModel : ViewModelBase, IRegDomainInteractionListener, IProgress<LogEntity>, IProgress<Tuple<int, RegDomainState>>, IProgress<Tuple<int, TimeSpan>>
     {
         // TODO: убрать создание таблиц
         private readonly Bootstrapper _bootstraper;
@@ -174,11 +175,11 @@ namespace DomainSetBidsApplication.ViewModels
                 MouseDoubleClickCommand = new RelayCommand<MouseButtonEventArgs>(MouseDoubleClickCommandHandler, (a) => SelectedItem != null);
 
                 Logs = new ObservableCollection<LogEntity>();
-                Domains = new ObservableCollection<RegDomainViewModel>();       
+                Domains = new ObservableCollection<RegDomainViewModel>();
 
-                MessengerInstance.Register<RegDomainEntity>(this, m => RegDomainEntityMessageHandler(m, false));
-                MessengerInstance.Register<RegDomainEntity>(this, "now", m => RegDomainEntityMessageHandler(m, true));
                 MessengerInstance.Register<LogEntity>(this, async e => await LogEntityMessageHandler(e));
+                MessengerInstance.Register<RegDomainEntity>(this, m => RegDomainEntityMessageHandler(m, false));
+                MessengerInstance.Register<RegDomainEntity>(this, MessageToken.RUN, m => RegDomainEntityMessageHandler(m, true));
             }
         }
 
@@ -204,7 +205,8 @@ namespace DomainSetBidsApplication.ViewModels
                 var viewModel = CreateRegDomainViewModel(entity);
                 await DispatcherHelper.RunAsync(() => Domains.Add(viewModel));
 
-                if (viewModel.State == RegDomainMode.Working || viewModel.State == RegDomainMode.Pending)
+                if (viewModel.Entity.State == RegDomainState.Working 
+                    || viewModel.Entity.State == RegDomainState.Pending)
                 {
                     viewModel.CommandBar.StartCommand.Execute(null);
                 }
@@ -224,7 +226,7 @@ namespace DomainSetBidsApplication.ViewModels
             return regDomainViewModel;
         }
 
-        private void RegDomainEntityMessageHandler(RegDomainEntity entity, bool isNow)
+        private void RegDomainEntityMessageHandler(RegDomainEntity entity, bool isRun)
         {
             if (entity != null)
             {
@@ -240,7 +242,7 @@ namespace DomainSetBidsApplication.ViewModels
                     Domains.Add(rdvm);
                 }
 
-                if (isNow)
+                if (isRun)
                 {
                     rdvm.CommandBar.StartCommand.Execute(null);
                 }
@@ -326,7 +328,12 @@ namespace DomainSetBidsApplication.ViewModels
             return _regDomainService.CreateTask(entity, userInfoEntity, this, this, this);
         }
 
-        public void Report(Tuple<int, RegDomainMode> tuple)
+        public async Task OnSaveStateAsync(RegDomainEntity entity)
+        {
+            await _regDomainService.UpdateAsync(entity);
+        }
+
+        public void Report(Tuple<int, RegDomainState> tuple)
         {
             var domain = Domains.FirstOrDefault(d => d.Entity.Id == tuple.Item1);
             if (domain != null) domain.State = tuple.Item2;
@@ -350,7 +357,7 @@ namespace DomainSetBidsApplication.ViewModels
         {
             base.Cleanup();
 
-            foreach (var viewModel in Domains.Where(d => d.State == RegDomainMode.Working || d.State == RegDomainMode.Pending))
+            foreach (var viewModel in Domains.Where(d => d.Entity.State == RegDomainState.Working || d.Entity.State == RegDomainState.Pending))
             {
                 viewModel.CommandBar.StopCommand.Execute(null);
             }

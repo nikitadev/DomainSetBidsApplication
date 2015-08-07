@@ -10,5 +10,7 @@ namespace DomainSetBidsApplication.ViewModels.InteractionListeners
         Task<Tuple<Task, CancellationTokenSource>> GetTaskAsync(RegDomainEntity entity);
 
         Task OnDomainRemoveAsync(RegDomainEntity entity);
+
+        Task OnSaveStateAsync(RegDomainEntity entity);
     }
 }

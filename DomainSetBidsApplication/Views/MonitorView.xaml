@@ -55,6 +55,9 @@
                     <Setter Property="Foreground" Value="{Binding State, Converter={StaticResource RegDomainModeToBrushesConverter}}"/>
                 </Style>
             </ListView.ItemContainerStyle>
+            <ListView.CommandBindings>
+                <CommandBinding Command="ApplicationCommands.Copy" Executed="CommandBinding_Executed" CanExecute="CommandBinding_CanExecute" />
+            </ListView.CommandBindings>
             <ListView.View>
                 <GridView>
                     <GridViewColumn Width="100" Header="{x:Static properties:Resources.Domain}"
@@ -81,7 +84,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     <GridViewColumn Width="100" Header="{x:Static properties:Resources.State}"
-                                    DisplayMemberBinding="{Binding State}" />
+                                    DisplayMemberBinding="{Binding StateLocalName}" />
                     <GridViewColumn Width="200">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>

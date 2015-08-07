@@ -97,7 +97,7 @@ namespace DomainSetBidsApplication.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Отмена.
+        ///   Looks up a localized string similar to отмена.
         /// </summary>
         public static string Cancel {
             get {
@@ -120,6 +120,24 @@ namespace DomainSetBidsApplication.Properties {
         public static string Clear {
             get {
                 return ResourceManager.GetString("Clear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Сохранить и очистить поля для новой записи.
+        /// </summary>
+        public static string ClearButtonTooltip {
+            get {
+                return ResourceManager.GetString("ClearButtonTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Поля очищенны.
+        /// </summary>
+        public static string ClearedMessage {
+            get {
+                return ResourceManager.GetString("ClearedMessage", resourceCulture);
             }
         }
         
@@ -178,6 +196,24 @@ namespace DomainSetBidsApplication.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to завершено.
+        /// </summary>
+        public static string Done {
+            get {
+                return ResourceManager.GetString("Done", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to черновик.
+        /// </summary>
+        public static string Draft {
+            get {
+                return ResourceManager.GetString("Draft", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Редактировать ставку.
         /// </summary>
         public static string EditBid {
@@ -232,6 +268,15 @@ namespace DomainSetBidsApplication.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to неопределено.
+        /// </summary>
+        public static string None {
+            get {
+                return ResourceManager.GetString("None", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Сейчас.
         /// </summary>
         public static string Now {
@@ -255,6 +300,15 @@ namespace DomainSetBidsApplication.Properties {
         public static string Password {
             get {
                 return ResourceManager.GetString("Password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to в ожидании.
+        /// </summary>
+        public static string Pending {
+            get {
+                return ResourceManager.GetString("Pending", resourceCulture);
             }
         }
         
@@ -340,11 +394,47 @@ namespace DomainSetBidsApplication.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Запустить.
+        /// </summary>
+        public static string Run {
+            get {
+                return ResourceManager.GetString("Run", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Данные сохраняются и форма редактирования закрывается, задание автоматом начинает выполняться.
+        /// </summary>
+        public static string RunButtonTooltip {
+            get {
+                return ResourceManager.GetString("RunButtonTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Сохранить.
         /// </summary>
         public static string Save {
             get {
                 return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cохранить и продолжить редактировать.
+        /// </summary>
+        public static string SaveButtonTooltip {
+            get {
+                return ResourceManager.GetString("SaveButtonTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ставка сохранена в черновик.
+        /// </summary>
+        public static string SavedMessage {
+            get {
+                return ResourceManager.GetString("SavedMessage", resourceCulture);
             }
         }
         
@@ -426,6 +516,15 @@ namespace DomainSetBidsApplication.Properties {
         public static string Username {
             get {
                 return ResourceManager.GetString("Username", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to запущено.
+        /// </summary>
+        public static string Working {
+            get {
+                return ResourceManager.GetString("Working", resourceCulture);
             }
         }
     }

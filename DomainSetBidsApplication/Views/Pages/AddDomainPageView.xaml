@@ -7,7 +7,7 @@
       xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
       xmlns:properties="clr-namespace:DomainSetBidsApplication.Properties"
       mc:Ignorable="d" 
-      d:DesignHeight="300" d:DesignWidth="300"
+      d:DesignHeight="400" d:DesignWidth="400"
       Template="{StaticResource PageControlTemplateKey}"
       DataContext="{Binding Source={StaticResource Locator}, Path=AddDomainPage}">
     <StackPanel Width="400">
@@ -65,18 +65,30 @@
                     TickFrequency="{Binding TickFrequency}"
                     Value="{Binding Frequency}" />
         </StackPanel>
-        <Button Width="80"
-                Margin="40, 10"
-                HorizontalAlignment="Right"
-                Content="{Binding TitleAddOrEditButton}"
-                Command="{Binding AddOrEditCommand}"
-                Style="{DynamicResource AccentedSquareButtonStyle}" />
-        <controls:TransitioningContentControl Width="250"
+        <StackPanel Margin="30, 10" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Width="80"
+                    Margin="10"
+                    ToolTip="{x:Static properties:Resources.ClearButtonTooltip}"
+                    Content="{x:Static properties:Resources.Clear}"
+                    Command="{Binding ClearCommand}"
+                    Style="{DynamicResource AccentedSquareButtonStyle}" />
+            <Button Width="80"
+                    Margin="10"
+                    ToolTip="{x:Static properties:Resources.RunButtonTooltip}"
+                    Content="{x:Static properties:Resources.Run}"
+                    Command="{Binding RunCommand}"
+                    Style="{DynamicResource AccentedSquareButtonStyle}" />
+            <Button Width="80"
+                    Margin="10"
+                    ToolTip="{x:Static properties:Resources.SaveButtonTooltip}"
+                    Content="{x:Static properties:Resources.Save}"
+                    Command="{Binding SaveCommand}"
+                    Style="{DynamicResource AccentedSquareButtonStyle}" />
+        </StackPanel>
+        <controls:TransitioningContentControl Width="350"
                                               Height="50"
-                                              Margin="0, 10, 0, 0"
+                                              Margin="30, 0"
                                               Transition="Down"
-                                              HorizontalAlignment="Right"
                                               Content="{Binding TextMessage}" />
-        <!--<Label Content="{Binding TextMessage}" HorizontalAlignment="Right" />-->
     </StackPanel>
 </Page>

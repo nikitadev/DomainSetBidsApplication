@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Windows;
 using AviaTicketsWpfApplication.Models;
+using DomainSetBidsApplication.Utils;
 using DomainSetBidsApplication.ViewModels;
 using GalaSoft.MvvmLight.Messaging;
 using MahApps.Metro.Controls;
@@ -25,17 +26,26 @@ namespace DomainSetBidsApplication.Views
             mainFrame.NavigationService.Navigate(DataContext);
         }
 
-        protected override void OnInitialized(System.EventArgs e)
+        protected override void OnInitialized(EventArgs e)
         {
             base.OnInitialized(e);
 
             Messenger.Default.Register<PageMessage>(this, PageMessageHandler);
+            Messenger.Default.Register<bool>(this, MessageToken.PAGE_GO_BACK, NavigationBackHandler);
         }
 
         private void PageMessageHandler(PageMessage msg)
         {
             var uriPage = ViewModelLocator.GetPathPage(msg.TypeViewModel);
             mainFrame.NavigationService.Navigate(uriPage, msg.Parametrs);
+        }
+
+        private void NavigationBackHandler(bool isBack)
+        {
+            if (isBack)
+                mainFrame.NavigationService.GoBack();
+
+            mainFrame.NavigationService.GoForward();
         }
 
         private async Task CloseHandleAsync()

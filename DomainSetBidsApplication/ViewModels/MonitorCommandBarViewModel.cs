@@ -27,10 +27,15 @@ namespace DomainSetBidsApplication.ViewModels
 
             _isStartCommandPressed = false;
 
-            StartCommand = new RelayCommand(async () => await StartCommandHandler(), () => !_isStartCommandPressed && _monitorCommandBarInteractionListener.CanStarted());
+            StartCommand = new RelayCommand(async () => await StartCommandHandler(), CanStartAndEdit);
             StopCommand = new RelayCommand(StopCommandHandler, () => _isStartCommandPressed);
-            EditCommand = new RelayCommand(EditCommandHandler, () => !_isStartCommandPressed);
+            EditCommand = new RelayCommand(EditCommandHandler, CanStartAndEdit);
             DeleteCommand = new RelayCommand(async () => await DeleteCommandHandler(), () => !_isStartCommandPressed);
+        }
+
+        private bool CanStartAndEdit()
+        {
+            return !_isStartCommandPressed && _monitorCommandBarInteractionListener.CanStarted();
         }
 
         private void RaiseAll()
