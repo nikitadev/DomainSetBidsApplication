@@ -188,10 +188,12 @@ namespace DomainSetBidsApplication.ViewModels.Pages
 
                     Id = regDomainEntity.Id;
                 }
+                else
+                {
+                    RaisePropertyChanged(nameof(Name));
 
-                RaisePropertyChanged(nameof(Name));
-
-                return null;
+                    return null;
+                }
             }
             else
             {
@@ -237,6 +239,8 @@ namespace DomainSetBidsApplication.ViewModels.Pages
         {
             base.Cleanup();
 
+            _hasBids = false;
+
             Id = 0;
 
             IsNow = true;
@@ -274,6 +278,7 @@ namespace DomainSetBidsApplication.ViewModels.Pages
                     if (_hasBids)
                     {
                         result = Resources.DomainExistsValidateMessage;
+                        _hasBids = false;
                     }
                     else if (String.IsNullOrEmpty(Name))
                     {
