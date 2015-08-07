@@ -24,7 +24,7 @@ namespace DomainSetBidsApplication.ViewModels
             set
             {
                 Set(ref _entity, value);
-                RaisePropertyChanged(() => State);
+                RaisePropertyChanged(nameof(State));
             }
         }
 
@@ -37,7 +37,7 @@ namespace DomainSetBidsApplication.ViewModels
                 Set(ref _state, value);
                 Entity.State = value;
 
-                RaisePropertyChanged(() => StateLocalName);
+                RaisePropertyChanged(nameof(StateLocalName));
             }
         }
 
@@ -60,11 +60,6 @@ namespace DomainSetBidsApplication.ViewModels
             _regDomainInteractionListener = regDomainInteractionListener;
 
             CommandBar = new MonitorCommandBarViewModel(this);
-        }
-
-        private void Tick()
-        {
-            
         }
 
         public async Task StartTimer(TimeSpan timeSpan)

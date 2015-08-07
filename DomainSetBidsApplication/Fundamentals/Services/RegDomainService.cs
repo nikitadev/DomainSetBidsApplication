@@ -20,17 +20,11 @@ namespace DomainSetBidsApplication.Fundamentals
         {
         }
 
-        private LogEntity CreateLog(RegDomainEntity regDomainEntity, LogType type, object data)
+        public async Task<bool> HasEntityByName(string name)
         {
-            return new LogEntity
-            {
-                Name = regDomainEntity.Name,
-                Register = regDomainEntity.Register,
-                Rate = regDomainEntity.Rate,
-                Type = type,
-                Date = DateTime.Now,
-                Description = data.ToString()
-            };           
+            var entity = _repository.Table.Where(e => e.Name.Equals(name));
+
+            return await entity.CountAsync() != 0;
         }
 
         public Tuple<Task, CancellationTokenSource> CreateTask(
@@ -127,6 +121,19 @@ namespace DomainSetBidsApplication.Fundamentals
             }
 
             return null;
+        }
+
+        private LogEntity CreateLog(RegDomainEntity regDomainEntity, LogType type, object data)
+        {
+            return new LogEntity
+            {
+                Name = regDomainEntity.Name,
+                Register = regDomainEntity.Register,
+                Rate = regDomainEntity.Rate,
+                Type = type,
+                Date = DateTime.Now,
+                Description = data.ToString()
+            };
         }
     }
 }

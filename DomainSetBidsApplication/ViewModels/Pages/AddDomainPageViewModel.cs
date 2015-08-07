@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using DomainSetBidsApplication.Fundamentals.Interfaces;
@@ -12,11 +13,15 @@ using Newtonsoft.Json;
 
 namespace DomainSetBidsApplication.ViewModels.Pages
 {
-    public sealed class AddDomainPageViewModel : ViewModelBase
+    public sealed class AddDomainPageViewModel : ViewModelBase, IDataErrorInfo
     {
         public const string ARG = "data";
 
         private readonly IRegDomainService _regDomainService;
+
+        private readonly HashSet<string> _columnClearValidations;
+
+        private bool _hasBids;
 
         public RelayCommand ClearCommand { get; private set; }
         public RelayCommand RunCommand { get; private set; }
@@ -117,14 +122,22 @@ namespace DomainSetBidsApplication.ViewModels.Pages
                     Date = null;
                     StartTimeHours = StartTimeMinutes = StartTimeSeconds = null;
                 }
-
+                
                 Set(ref _isNow, value);
+
+                RaisePropertyChanged(nameof(Date));
+                RaisePropertyChanged(nameof(StartTimeHours));
+                RaisePropertyChanged(nameof(StartTimeMinutes));
+                RaisePropertyChanged(nameof(StartTimeSeconds));
             }
         }
 
         public AddDomainPageViewModel(IRegDomainService regDomainService)
         {
             _regDomainService = regDomainService;
+            _columnClearValidations = new HashSet<string>();
+
+            _hasBids = false;
 
             MaximumFrequency = Settings.Default.MaximumFrequency;
             TickFrequency = Settings.Default.TickFrequency;
@@ -133,7 +146,7 @@ namespace DomainSetBidsApplication.ViewModels.Pages
 
             ClearCommand = new RelayCommand(async () => await ClearCommandHandler());
             RunCommand = new RelayCommand(async () => await RunCommandHandler());
-            SaveCommand = new RelayCommand(async () => await SaveCommandHandler());
+            SaveCommand = new RelayCommand(async () => await SaveCommandHandler(), () => String.IsNullOrEmpty(Error));
             
             MessengerInstance.Register<DetailsPageMessage>(this, DetailsPageMessageHandler);
         }
@@ -168,7 +181,17 @@ namespace DomainSetBidsApplication.ViewModels.Pages
 
             if (Id == 0)
             {
-                await _regDomainService.InsertAsync(regDomainEntity);
+                _hasBids = await _regDomainService.HasEntityByName(Name);
+                if (!_hasBids)
+                {
+                    await _regDomainService.InsertAsync(regDomainEntity);
+
+                    Id = regDomainEntity.Id;
+                }
+
+                RaisePropertyChanged(nameof(Name));
+
+                return null;
             }
             else
             {
@@ -192,17 +215,22 @@ namespace DomainSetBidsApplication.ViewModels.Pages
         {
             var entity = await CreateOrUpdateEntity();
 
-            MessengerInstance.Send(entity, MessageToken.RUN);
-            MessengerInstance.Send(true, MessageToken.PAGE_GO_BACK);
+            if (entity != null)
+            {
+                MessengerInstance.Send(entity, MessageToken.RUN);
+                MessengerInstance.Send(true, MessageToken.PAGE_GO_BACK);
+            }
         }
 
         private async Task SaveCommandHandler()
         {
             var entity = await CreateOrUpdateEntity();
 
-            MessengerInstance.Send(entity);
-
-            TextMessage = Resources.SavedMessage; 
+            if (entity != null)
+            {
+                MessengerInstance.Send(entity);
+                TextMessage = Resources.SavedMessage;
+            }
         }
 
         public override void Cleanup()
@@ -223,13 +251,80 @@ namespace DomainSetBidsApplication.ViewModels.Pages
 
             Frequency = 10;
 
-            //StartTimeHours = DateTime.Now.Hour;
-            //StartTimeMinutes = DateTime.Now.Minute;
-            //StartTimeSeconds = DateTime.Now.Second;
-
             StartTimeHours = StartTimeMinutes = StartTimeSeconds = null;
 
             TextMessage = String.Empty;
+        }
+
+        public string Error
+        {
+            get
+            {
+                return String.Join(", ", _columnClearValidations.ToArray());
+            }
+        }
+
+        public string this[string columnName]
+        {
+            get
+            {
+                string result = String.Empty;
+                if (columnName == nameof(Name))
+                {
+                    if (_hasBids)
+                    {
+                        result = Resources.DomainExistsValidateMessage;
+                    }
+                    else if (String.IsNullOrEmpty(Name))
+                    {
+                        result = Resources.DomainValidateMessage;
+                    }
+                }
+                if (columnName == nameof(Register))
+                {
+                    if (Register == null)
+                        result = Resources.RegistratorValidateMessage;
+                }
+                if (columnName == nameof(Rate))
+                {
+                    if (!Rate.HasValue)
+                        result = Resources.RateValidateMessage;
+                }
+
+                if (columnName == nameof(Date))
+                {
+                    if (!Date.HasValue && !IsNow)
+                        result = Resources.DateValidateMessage;
+                }
+                if (columnName == nameof(StartTimeHours))
+                {
+                    if (!StartTimeHours.HasValue && !IsNow)
+                        result = Resources.HourValidateMessage;
+                }
+                if (columnName == nameof(StartTimeMinutes))
+                {
+                    if (!StartTimeMinutes.HasValue && !IsNow)
+                        result = Resources.MinuteValidateMessage;
+                }
+                if (columnName == nameof(StartTimeSeconds))
+                {
+                    if (!StartTimeSeconds.HasValue && !IsNow)
+                        result = Resources.SecondValidateMessage;
+                }
+
+                if (!String.IsNullOrEmpty(result))
+                {
+                    _columnClearValidations.Add(columnName);
+                }
+                else if (_columnClearValidations.Contains(columnName))
+                {
+                    _columnClearValidations.Remove(columnName);
+                }
+
+                SaveCommand.RaiseCanExecuteChanged();
+
+                return result;
+            }
         }
     }
 }

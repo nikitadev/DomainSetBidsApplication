@@ -101,7 +101,8 @@ namespace DomainSetBidsApplication.ViewModels
 
         public static void Cleanup()
         {
-            SimpleIoc.Default.Unregister<IDbConnection>();
+            var vm = ServiceLocator.Current.GetInstance<MainViewModel>();
+            vm.Cleanup();
         }
     }
 }

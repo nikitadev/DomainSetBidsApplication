@@ -45,6 +45,7 @@ namespace DomainSetBidsApplication.ViewModels
 
         public RelayCommand AddCommand { get; private set; }
         public RelayCommand ClearCommand { get; private set; }
+        public RelayCommand LoadLogsCommand { get; private set; }
 
         public RelayCommand<NavigatingCancelEventArgs> NavigatingCommand { get; private set; }
         public RelayCommand<NavigationEventArgs> NavigatedCommand { get; private set; }
@@ -168,6 +169,7 @@ namespace DomainSetBidsApplication.ViewModels
 
                 AddCommand = new RelayCommand(AddCommandHandler);
                 ClearCommand = new RelayCommand(() => Logs.Clear());
+                LoadLogsCommand = new RelayCommand(async () => await LoadLogsCommandHandler());
 
                 NavigatingCommand = new RelayCommand<NavigatingCancelEventArgs>(NavigatingCommandHandler);
                 NavigatedCommand = new RelayCommand<NavigationEventArgs>(NavigatedCommandHandler);
@@ -218,10 +220,6 @@ namespace DomainSetBidsApplication.ViewModels
         private RegDomainViewModel CreateRegDomainViewModel(RegDomainEntity entity)
         {
             var regDomainViewModel = new RegDomainViewModel(this) { Entity = entity };
-            //{
-            //    Entity = entity,
-            //    State = RegDomainMode.Draft
-            //};
 
             return regDomainViewModel;
         }
@@ -297,22 +295,27 @@ namespace DomainSetBidsApplication.ViewModels
             }
         }
 
+        private void MouseDoubleClickCommandHandler(MouseButtonEventArgs args)
+        {
+            SelectedItem.CommandBar.EditCommand.Execute(null);
+        }
+
         private void AddCommandHandler()
         {
             PageTitle = Resources.AddBid;
             MessengerInstance.Send(new PageMessage(typeof(AddDomainPageViewModel)));
         }
 
-        private void MouseDoubleClickCommandHandler(MouseButtonEventArgs args)
+        private async Task LoadLogsCommandHandler()
         {
-            SelectedItem.CommandBar.EditCommand.Execute(null);
-        }
-
-        private async Task ClearAsync()
-        {
-            await Task.Yield();
-
-            Cleanup();
+            if (IsSelectedOnLog)
+            {
+                Logs = new ObservableCollection<LogEntity>(await _logService.GetLogsByNameAsync(SelectedItem.Entity.Name));
+            }
+            else
+            {
+                Logs = new ObservableCollection<LogEntity>(await _logService.GetAllAsync());
+            }
         }
 
         public async Task OnDomainRemoveAsync(RegDomainEntity entity)
@@ -353,11 +356,19 @@ namespace DomainSetBidsApplication.ViewModels
             await DispatcherHelper.RunAsync(() => MessengerInstance.Send(value));
         }
 
+        private async Task ClearAsync()
+        {
+            await Task.Yield();
+
+            Cleanup();
+        }
+
         public override void Cleanup()
         {
             base.Cleanup();
 
-            foreach (var viewModel in Domains.Where(d => d.Entity.State == RegDomainState.Working || d.Entity.State == RegDomainState.Pending))
+            var domains = Domains.Where(d => d.Entity.State == RegDomainState.Working || d.Entity.State == RegDomainState.Pending);
+            foreach (var viewModel in domains)
             {
                 viewModel.CommandBar.StopCommand.Execute(null);
             }

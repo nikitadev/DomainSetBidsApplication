@@ -133,7 +133,7 @@ namespace DomainSetBidsApplication.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Поля очищенны.
+        ///   Looks up a localized string similar to Поля очищенны для новой ставки.
         /// </summary>
         public static string ClearedMessage {
             get {
@@ -169,6 +169,15 @@ namespace DomainSetBidsApplication.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Укажите дату для ставки.
+        /// </summary>
+        public static string DateValidateMessage {
+            get {
+                return ResourceManager.GetString("DateValidateMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Определение.
         /// </summary>
         public static string Description {
@@ -187,11 +196,29 @@ namespace DomainSetBidsApplication.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ставка с таким именем домена уже существует.
+        /// </summary>
+        public static string DomainExistsValidateMessage {
+            get {
+                return ResourceManager.GetString("DomainExistsValidateMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Введите домен.
         /// </summary>
         public static string DomainTooltip {
             get {
                 return ResourceManager.GetString("DomainTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Введите название домена.
+        /// </summary>
+        public static string DomainValidateMessage {
+            get {
+                return ResourceManager.GetString("DomainValidateMessage", resourceCulture);
             }
         }
         
@@ -250,6 +277,15 @@ namespace DomainSetBidsApplication.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Укажите час или введите 0.
+        /// </summary>
+        public static string HourValidateMessage {
+            get {
+                return ResourceManager.GetString("HourValidateMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Логи.
         /// </summary>
         public static string Logs {
@@ -264,6 +300,15 @@ namespace DomainSetBidsApplication.Properties {
         public static string Minute {
             get {
                 return ResourceManager.GetString("Minute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Укажите минуты или введите 0.
+        /// </summary>
+        public static string MinuteValidateMessage {
+            get {
+                return ResourceManager.GetString("MinuteValidateMessage", resourceCulture);
             }
         }
         
@@ -385,11 +430,29 @@ namespace DomainSetBidsApplication.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Укажите тариф.
+        /// </summary>
+        public static string RateValidateMessage {
+            get {
+                return ResourceManager.GetString("RateValidateMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Регистратор.
         /// </summary>
         public static string Register {
             get {
                 return ResourceManager.GetString("Register", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Выбирите регистратора из списка.
+        /// </summary>
+        public static string RegistratorValidateMessage {
+            get {
+                return ResourceManager.GetString("RegistratorValidateMessage", resourceCulture);
             }
         }
         
@@ -444,6 +507,15 @@ namespace DomainSetBidsApplication.Properties {
         public static string Second {
             get {
                 return ResourceManager.GetString("Second", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Укажите секунды или введите 0.
+        /// </summary>
+        public static string SecondValidateMessage {
+            get {
+                return ResourceManager.GetString("SecondValidateMessage", resourceCulture);
             }
         }
         
@@ -507,6 +579,15 @@ namespace DomainSetBidsApplication.Properties {
         public static string TitleDlgExitApp {
             get {
                 return ResourceManager.GetString("TitleDlgExitApp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Загрузить логи.
+        /// </summary>
+        public static string ToolTipLoadLogs {
+            get {
+                return ResourceManager.GetString("ToolTipLoadLogs", resourceCulture);
             }
         }
         

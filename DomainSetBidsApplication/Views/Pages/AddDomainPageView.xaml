@@ -13,22 +13,24 @@
     <StackPanel Width="400">
         <TextBox Width="300"
                  Margin="0, 10, 0, 0"
-                 Text="{Binding Name}"
+                 Text="{Binding Name, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=True}"
                  ToolTip="{x:Static properties:Resources.DomainTooltip}"
                  controls:TextBoxHelper.IsWaitingForData="True"
                  controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Domain}" />
         <ComboBox Width="300"
                   Margin="0, 10, 0, 0"
                   IsEditable="True"
-                  SelectedItem="{Binding Register}"
+                  SelectedItem="{Binding Register, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=True}"
                   ItemsSource="{Binding Registers}"
                   controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Register}" />
-        <TextBox Width="300"
-                 Margin="0, 10, 0, 0"
-                 Text="{Binding Rate}"
-                 ToolTip="{x:Static properties:Resources.RateTooltip}"
-                 controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Rate}" />
-        <CheckBox Width="300" Margin="0, 10, 0, 0" Content="{x:Static properties:Resources.Now}" IsChecked="{Binding IsNow}" />
+        <controls:NumericUpDown Grid.Column="1" Width="300" Margin="0, 10, 0, 0" 
+                                Minimum="0" TextAlignment="Left"
+                                controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Rate}"
+                                Value="{Binding Rate, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=True}" />
+        <CheckBox Width="300" 
+                  Margin="0, 10, 0, 0" 
+                  Content="{x:Static properties:Resources.Now}" 
+                  IsChecked="{Binding IsNow}" />
         <DatePicker Width="300"
                     Margin="0, 10, 0, 0"
                     HorizontalAlignment="Center"
@@ -45,13 +47,13 @@
                 </Grid.ColumnDefinitions>
                 <controls:NumericUpDown Margin="5" Minimum="0" Maximum="23" 
                                         controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Hour}"
-                                        Value="{Binding StartTimeHours, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Value="{Binding StartTimeHours, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=True}" />
                 <controls:NumericUpDown Margin="5" Minimum="0" Maximum="59" Grid.Column="1" 
                                         controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Minute}"
-                                        Value="{Binding StartTimeMinutes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Value="{Binding StartTimeMinutes, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=True}" />
                 <controls:NumericUpDown Margin="5" Minimum="0" Maximum="59" Grid.Column="2" 
                                         controls:TextBoxHelper.Watermark="{x:Static properties:Resources.Second}"
-                                        Value="{Binding StartTimeSeconds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                        Value="{Binding StartTimeSeconds, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=True}" />
             </Grid>
         </StackPanel>
         <StackPanel Width="300">

@@ -20,17 +20,42 @@
             <Label HorizontalAlignment="Left"
                    Content="{x:Static properties:Resources.Logs}" 
                    Style="{StaticResource DescriptionHeaderStyleKey}"/>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5, 0">
                 <controls:ToggleSwitch Margin="10, 0, 0, 0"
-                                   IsChecked="{Binding IsSelectedOnLog}"
-                                   OnLabel="{x:Static properties:Resources.ShowSelectedItemLogs}"
-                                   OffLabel="{x:Static properties:Resources.ShowAllLogs}" />
-                <Button Width="100"
-                    Margin="5, 0"
-                    HorizontalAlignment="Right"
-                    Content="{x:Static properties:Resources.Clear}"
-                    Command="{Binding ClearCommand}"
-                    Style="{DynamicResource AccentedSquareButtonStyle}" />
+                                       VerticalAlignment="Center"
+                                       IsChecked="{Binding IsSelectedOnLog}"
+                                       OnLabel="{x:Static properties:Resources.ShowSelectedItemLogs}"
+                                       OffLabel="{x:Static properties:Resources.ShowAllLogs}" />
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                <Button Width="50"
+                        Height="50"
+                        ToolTip="{x:Static properties:Resources.ToolTipLoadLogs}"
+                        Command="{Binding LoadLogsCommand}"
+                        Style="{DynamicResource MetroCircleButtonStyle}">
+                    <Rectangle Width="25"
+                               Height="20"
+                               Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
+                        <Rectangle.OpacityMask>
+                            <VisualBrush Stretch="Fill"
+                                         Visual="{DynamicResource appbar_inbox}" />
+                        </Rectangle.OpacityMask>
+                    </Rectangle>
+                </Button>
+                <Button Width="50"
+                        Height="50"
+                        Margin="10, 0, 0, 0"
+                        ToolTip="{x:Static properties:Resources.Clear}"
+                        Command="{Binding ClearCommand}"
+                        Style="{DynamicResource MetroCircleButtonStyle}">
+                    <Rectangle Width="20"
+                               Height="20"
+                               Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Button}}}">
+                        <Rectangle.OpacityMask>
+                            <VisualBrush Stretch="Fill"
+                                         Visual="{DynamicResource appbar_clean}" />
+                        </Rectangle.OpacityMask>
+                    </Rectangle>
+                </Button>
             </StackPanel>
         </Grid>
         <ListBox Margin="5"

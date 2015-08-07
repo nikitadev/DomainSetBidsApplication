@@ -7,6 +7,8 @@ namespace DomainSetBidsApplication.Fundamentals.Interfaces
 {
     public interface IRegDomainService : IService<RegDomainEntity>
     {
+        Task<bool> HasEntityByName(string name);
+
         Tuple<Task, CancellationTokenSource> CreateTask(
             RegDomainEntity regDomainentity, 
             UserInfoEntity userInfoEntity,

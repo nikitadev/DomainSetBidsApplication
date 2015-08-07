@@ -142,7 +142,7 @@
     <value>Сохранить и очистить поля для новой записи</value>
   </data>
   <data name="ClearedMessage" xml:space="preserve">
-    <value>Поля очищенны</value>
+    <value>Поля очищенны для новой ставки</value>
   </data>
   <data name="Close" xml:space="preserve">
     <value>Закрыть</value>
@@ -153,14 +153,23 @@
   <data name="CountryToolTip" xml:space="preserve">
     <value>Пример: 'RU'</value>
   </data>
+  <data name="DateValidateMessage" xml:space="preserve">
+    <value>Укажите дату для ставки</value>
+  </data>
   <data name="Description" xml:space="preserve">
     <value>Определение</value>
   </data>
   <data name="Domain" xml:space="preserve">
     <value>Домен</value>
   </data>
+  <data name="DomainExistsValidateMessage" xml:space="preserve">
+    <value>Ставка с таким именем домена уже существует</value>
+  </data>
   <data name="DomainTooltip" xml:space="preserve">
     <value>Введите домен</value>
+  </data>
+  <data name="DomainValidateMessage" xml:space="preserve">
+    <value>Введите название домена</value>
   </data>
   <data name="Done" xml:space="preserve">
     <value>завершено</value>
@@ -180,11 +189,17 @@
   <data name="Hour" xml:space="preserve">
     <value>Часы</value>
   </data>
+  <data name="HourValidateMessage" xml:space="preserve">
+    <value>Укажите час или введите 0</value>
+  </data>
   <data name="Logs" xml:space="preserve">
     <value>Логи</value>
   </data>
   <data name="Minute" xml:space="preserve">
     <value>Минуты</value>
+  </data>
+  <data name="MinuteValidateMessage" xml:space="preserve">
+    <value>Укажите минуты или введите 0</value>
   </data>
   <data name="None" xml:space="preserve">
     <value>неопределено</value>
@@ -225,8 +240,14 @@
   <data name="RateTooltip" xml:space="preserve">
     <value>Введите тариф</value>
   </data>
+  <data name="RateValidateMessage" xml:space="preserve">
+    <value>Укажите тариф</value>
+  </data>
   <data name="Register" xml:space="preserve">
     <value>Регистратор</value>
+  </data>
+  <data name="RegistratorValidateMessage" xml:space="preserve">
+    <value>Выбирите регистратора из списка</value>
   </data>
   <data name="Run" xml:space="preserve">
     <value>Запустить</value>
@@ -245,6 +266,9 @@
   </data>
   <data name="Second" xml:space="preserve">
     <value>Секунды</value>
+  </data>
+  <data name="SecondValidateMessage" xml:space="preserve">
+    <value>Укажите секунды или введите 0</value>
   </data>
   <data name="Settings" xml:space="preserve">
     <value>Настройки</value>
@@ -266,6 +290,9 @@
   </data>
   <data name="TitleDlgExitApp" xml:space="preserve">
     <value>Выход из приложения</value>
+  </data>
+  <data name="ToolTipLoadLogs" xml:space="preserve">
+    <value>Загрузить логи</value>
   </data>
   <data name="Username" xml:space="preserve">
     <value>Пользователь</value>
