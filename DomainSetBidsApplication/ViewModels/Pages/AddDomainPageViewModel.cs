@@ -144,8 +144,8 @@ namespace DomainSetBidsApplication.ViewModels.Pages
 
             Cleanup();
 
-            ClearCommand = new RelayCommand(async () => await ClearCommandHandler());
-            RunCommand = new RelayCommand(async () => await RunCommandHandler());
+            ClearCommand = new RelayCommand(async () => await ClearCommandHandler(), () => String.IsNullOrEmpty(Error));
+            RunCommand = new RelayCommand(async () => await RunCommandHandler(), () => String.IsNullOrEmpty(Error));
             SaveCommand = new RelayCommand(async () => await SaveCommandHandler(), () => String.IsNullOrEmpty(Error));
             
             MessengerInstance.Register<DetailsPageMessage>(this, DetailsPageMessageHandler);
@@ -326,6 +326,8 @@ namespace DomainSetBidsApplication.ViewModels.Pages
                     _columnClearValidations.Remove(columnName);
                 }
 
+                ClearCommand.RaiseCanExecuteChanged();
+                RunCommand.RaiseCanExecuteChanged();
                 SaveCommand.RaiseCanExecuteChanged();
 
                 return result;

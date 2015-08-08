@@ -68,7 +68,7 @@
                                     DisplayMemberBinding="{Binding Entity.Rate}" />
                     <GridViewColumn Width="200" Header="{x:Static properties:Resources.StartDate}"
                                     DisplayMemberBinding="{Binding Entity.Date, StringFormat={}{0:dd.MM.yyyy}}" />
-                    <GridViewColumn Width="200" Header="{x:Static properties:Resources.StartTime}">
+                    <GridViewColumn Width="500" Header="{x:Static properties:Resources.StartTime}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock>

@@ -138,6 +138,9 @@
   <data name="Clear" xml:space="preserve">
     <value>Очистить</value>
   </data>
+  <data name="ClearAndSave" xml:space="preserve">
+    <value>Сохранить и очистить</value>
+  </data>
   <data name="ClearButtonTooltip" xml:space="preserve">
     <value>Сохранить и очистить поля для новой записи</value>
   </data>
@@ -250,7 +253,7 @@
     <value>Выбирите регистратора из списка</value>
   </data>
   <data name="Run" xml:space="preserve">
-    <value>Запустить</value>
+    <value>Сохранить и запустить</value>
   </data>
   <data name="RunButtonTooltip" xml:space="preserve">
     <value>Данные сохраняются и форма редактирования закрывается, задание автоматом начинает выполняться</value>

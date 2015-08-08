@@ -124,6 +124,15 @@ namespace DomainSetBidsApplication.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Сохранить и очистить.
+        /// </summary>
+        public static string ClearAndSave {
+            get {
+                return ResourceManager.GetString("ClearAndSave", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Сохранить и очистить поля для новой записи.
         /// </summary>
         public static string ClearButtonTooltip {
@@ -457,7 +466,7 @@ namespace DomainSetBidsApplication.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Запустить.
+        ///   Looks up a localized string similar to Сохранить и запустить.
         /// </summary>
         public static string Run {
             get {

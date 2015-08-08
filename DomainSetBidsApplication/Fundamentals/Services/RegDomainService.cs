@@ -78,9 +78,16 @@ namespace DomainSetBidsApplication.Fundamentals
 
                             if (regDomainEntity.Hour.HasValue && regDomainEntity.Minute.HasValue && regDomainEntity.Second.HasValue)
                             {
-                                var timeSpanNow = new TimeSpan(DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
-                                var timeSpanStart = new TimeSpan(regDomainEntity.Hour.Value, regDomainEntity.Minute.Value, regDomainEntity.Second.Value);
-                                var delay = timeSpanStart - timeSpanNow;
+                                var date = regDomainEntity.Date.Value
+                                    .AddHours(regDomainEntity.Hour.Value)
+                                    .AddMinutes(regDomainEntity.Minute.Value)
+                                    .AddSeconds(regDomainEntity.Second.Value);
+
+                                //var timeSpanNow = new TimeSpan(DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+                                //var timeSpanStart = new TimeSpan(regDomainEntity.Hour.Value, regDomainEntity.Minute.Value, regDomainEntity.Second.Value);
+                                //var delay = timeSpanStart - timeSpanNow;
+
+                                var delay = date - DateTime.Now;
 
                                 progressTimer.Report(new Tuple<int, TimeSpan>(regDomainEntity.Id, delay));
                                 if (delay.TotalMilliseconds > 0) await Task.Delay((int)delay.TotalMilliseconds, token);
