@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -18,21 +19,28 @@ namespace DomainSetBidsApplication.Views
 
         private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = (sender as ListBox).SelectedItem != null;
+            var listBox = (sender as ListBox);
+            e.CanExecute = listBox.SelectedItems != null;
         }
 
         private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             var listBox = sender as ListBox;
 
-            // Get the ListBoxItem 
-            var listItem = listBox.ItemContainerGenerator.ContainerFromIndex(listBox.SelectedIndex) as ListBoxItem;
+            var elements = new List<FrameworkElement>();
+            foreach (var items in listBox.SelectedItems)
+            {
+                // Get the ListBoxItem 
+                var listItem = listBox.ItemContainerGenerator.ContainerFromIndex(listBox.SelectedIndex) as ListBoxItem;
 
-            // Retrieve the first child which is assumed to be a framework element
-            var element = VisualTreeHelper.GetChild(listItem, 0) as FrameworkElement;
+                // Retrieve the first child which is assumed to be a framework element
+                var element = VisualTreeHelper.GetChild(listItem, 0) as FrameworkElement;
 
-            // now perform the copy
-            element.ToClipboard();
+                elements.Add(element);
+
+                // now perform the copy
+                elements.ToClipboard();
+            }
         }
     }
 }

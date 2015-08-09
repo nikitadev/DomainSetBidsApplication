@@ -15,7 +15,7 @@ namespace DomainSetBidsApplication.ViewModels
         private readonly IRegDomainInteractionListener _regDomainInteractionListener;
 
         private bool _isTimerStop;
-        private CancellationTokenSource _cancellationTokenSource;
+        private CancellationTokenSource _cancellationTokenSource, _cancellationTokenSourceTimer;
         
         private RegDomainEntity _entity;
         public RegDomainEntity Entity
@@ -68,6 +68,9 @@ namespace DomainSetBidsApplication.ViewModels
 
             var oneSecond = TimeSpan.FromSeconds(1);
             var oneBackSecond = TimeSpan.FromSeconds(-1);
+
+            _cancellationTokenSourceTimer = new CancellationTokenSource();
+            var token = _cancellationTokenSourceTimer.Token;
             await Task.Run(async () => 
             {
                 do
@@ -79,8 +82,14 @@ namespace DomainSetBidsApplication.ViewModels
 
                     _isTimerStop = delayTime == TimeSpan.Zero;
 
+                    if (token.IsCancellationRequested)
+                    {
+                        token.ThrowIfCancellationRequested();
+                    }
+
                 } while (!_isTimerStop);
-            });
+            }, token)
+            .ContinueWith(t => _isTimerStop = t.IsCanceled);
         }
 
         public async Task OnStartedAsync()
@@ -108,9 +117,12 @@ namespace DomainSetBidsApplication.ViewModels
         {
             if (_cancellationTokenSource != null)
             {
-                _isTimerStop = true;
-
                 _cancellationTokenSource.Cancel();
+            }
+
+            if (_cancellationTokenSourceTimer != null)
+            {
+                _cancellationTokenSourceTimer.Cancel();
             }
         }
 

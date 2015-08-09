@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 using System.Windows;
 
 namespace DomainSetBidsApplication.Utils
@@ -22,6 +23,37 @@ namespace DomainSetBidsApplication.Utils
 
             // Convert the CSV text to a UTF-8 byte stream before adding it to the container object.
             var bytes = Encoding.UTF8.GetBytes(csvText);
+            var stream = new System.IO.MemoryStream(bytes);
+            dataObject.SetData(DataFormats.CommaSeparatedValue, stream);
+
+            // lets start with the text representation 
+            // to make is easy we will just assume the object set as the DataContext has the ToString method overrideen and we use that as the text
+            dataObject.SetData(DataFormats.CommaSeparatedValue, stream);
+
+            // now place our object in the clipboard 
+            Clipboard.SetDataObject(dataObject, true);
+        }
+
+        public static void ToClipboard(this List<FrameworkElement> elements)
+        {
+            var builderTabbedText = new StringBuilder();
+            var builderCsvText = new StringBuilder();
+            foreach (var element in elements)
+            {
+                string tabbedText = element.DataContext.ToString();
+                string csvText = element.DataContext.ToString();
+
+                builderTabbedText.AppendLine(tabbedText);
+                builderCsvText.AppendLine(csvText);
+            }
+
+            // data object to hold our different formats representing the element 
+            var dataObject = new DataObject();
+
+            dataObject.SetText(builderTabbedText.ToString());
+
+            // Convert the CSV text to a UTF-8 byte stream before adding it to the container object.
+            var bytes = Encoding.UTF8.GetBytes(builderCsvText.ToString());
             var stream = new System.IO.MemoryStream(bytes);
             dataObject.SetData(DataFormats.CommaSeparatedValue, stream);
 

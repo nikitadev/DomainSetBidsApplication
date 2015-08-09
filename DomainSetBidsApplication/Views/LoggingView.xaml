@@ -63,10 +63,10 @@
                  VirtualizingStackPanel.IsVirtualizing="True"
                  VirtualizingPanel.VirtualizationMode="Recycling"
                  ForceCursor="True"
+                 SelectionMode="Multiple"
                  BorderThickness="1"
                  BorderBrush="{StaticResource AccentColorBrush}"
                  ItemsSource="{Binding Logs}"
-                 SelectedItem="{Binding SelectedItemLog}"
                  ItemTemplate="{StaticResource LogTemplateKey}">
             <ListBox.CommandBindings>
                 <CommandBinding Command="ApplicationCommands.Copy" Executed="CommandBinding_Executed" CanExecute="CommandBinding_CanExecute" />

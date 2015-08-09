@@ -132,13 +132,6 @@ namespace DomainSetBidsApplication.ViewModels
             }
         }
 
-        private LogEntity _selectedItemLog;
-        public LogEntity SelectedItemLog
-        {
-            get { return _selectedItemLog; }
-            set { Set(ref _selectedItemLog, value); }
-        }
-
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
@@ -347,7 +340,7 @@ namespace DomainSetBidsApplication.ViewModels
             if (tuple.Item2 != TimeSpan.Zero)
             {
                 var domain = Domains.FirstOrDefault(d => d.Entity.Id == tuple.Item1);
-                if (domain != null) await domain.StartTimer(tuple.Item2);
+                if (domain != null) await domain.StartTimer(tuple.Item2).ConfigureAwait(false);
             }
         }
 
